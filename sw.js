@@ -1,16 +1,4 @@
-/**
- * Days Tracking Pro â€” Service Worker
- * Version: 6.0.0
- *
- * Strategy:
- *   - App shell (HTML, icons, manifest) â†’ cache-first, background refresh
- *   - Firebase / external APIs â†’ network-only (never cache auth or db calls)
- *   - Fonts â†’ cache-first with long TTL (they never change)
- *   - Everything else â†’ network-first, fallback to cache
- *
- * On activate: purges ALL old cache versions and cleans stale entries
- * from the current cache that haven't been touched in 7 days.
- */
+
 
 const VERSION = 'dtp-v6';
 const SHELL_CACHE = `${VERSION}-shell`;
