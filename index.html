@@ -2458,8 +2458,7 @@
 
     function updateLoginMode(mode) {
       state.loginMode = mode;
-      els.modeButtons.forEach((btn) => btn.classList.toggle('active', btn.dataset.mode === mode));
-      hideStatus(els.loginStatus);
+      els.authFootNote.textContent = 'signin only works with existing accounts. no account? switch to sign up first.';
       if (mode === 'signin') {
         els.loginTitle.textContent = 'Welcome back';
         els.loginSub.textContent = 'Use your name, email, and password to enter your synced tracker. Guest mode skips sync.';
@@ -2547,23 +2546,30 @@
         if (state.loginMode === 'signup') {
           const created = await createUserWithEmailAndPassword(auth, email, password);
           await completeLogin({ name, email, uid: created.user.uid });
+          showToast('Account created successfully.', 'success');
           return;
         }
 
+        // SIGNIN: only sign in, never auto-create
         const signed = await signInWithEmailAndPassword(auth, email, password);
         await completeLogin({ name, email, uid: signed.user.uid });
       } catch (error) {
-        if (state.loginMode === 'signin' && ['auth/user-not-found', 'auth/invalid-credential', 'auth/invalid-login-credentials'].includes(error.code)) {
-          try {
-            const created = await createUserWithEmailAndPassword(auth, email, password);
-            await completeLogin({ name, email, uid: created.user.uid });
-            showToast('Account did not exist, so it got created. honestly convenient.', 'info');
-            return;
-          } catch (createError) {
-            showStatus(els.loginStatus, createError.message || 'auth failed.', 'error');
-            return;
+        if (['auth/user-not-found', 'auth/invalid-credential', 'auth/invalid-login-credentials'].includes(error.code)) {
+          if (state.loginMode === 'signin') {
+            showStatus(els.loginStatus, 'no account found with that email. switch to sign up to create one.', 'error');
+          } else {
+            showStatus(els.loginStatus, 'could not create account. email may already be registered with a different password.', 'error');
           }
+        } else if (error.code === 'auth/wrong-password') {
+          showStatus(els.loginStatus, 'wrong password. try again.', 'error');
+        } else if (error.code === 'auth/email-already-in-use') {
+          showStatus(els.loginStatus, 'this email already has an account. switch to sign in.', 'error');
+        } else if (error.code === 'auth/too-many-requests') {
+          showStatus(els.loginStatus, 'too many failed attempts. wait a bit and try again.', 'error');
+        } else {
+          showStatus(els.loginStatus, error.message || 'auth failed.', 'error');
         }
+      }
         showStatus(els.loginStatus, error.message || 'auth failed.', 'error');
       }
     }
