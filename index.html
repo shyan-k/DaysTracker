@@ -1,0 +1,2804 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<!-- skill:chrome -->
+<style>
+/* Credit line — bottom-right */
+.design-ui-credit {
+  position: fixed;
+  bottom: 12px;
+  right: 12px;
+  font: 11px/1 system-ui, sans-serif;
+  color: rgba(128,128,128,0.5);
+  pointer-events: none;
+  z-index: 2147483647;
+  transition: opacity 0.4s ease;
+  user-select: none;
+  letter-spacing: 0.02em;
+}
+
+/* Hide chrome on touch devices */
+@media (hover: none) {
+  .design-ui-credit { display: none; }
+}
+
+/* Print fixes */
+@media print {
+  * {
+    transition: none !important;
+    animation: none !important;
+    box-shadow: none !important;
+  }
+  body {
+    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact;
+  }
+  .design-ui-credit { display: none !important; }
+}
+
+</style>
+<script>
+(function () {
+    // Chrome UI (hover devices only): credit badge with idle-fade.
+    // Deferred until body exists since the script may run in <head>.
+    function initChromeUI() {
+        if (!matchMedia('(hover: hover)').matches) return;
+
+        var credit = document.createElement('div');
+        credit.className = 'design-ui-credit';
+        credit.setAttribute('aria-hidden', 'true');
+        credit.innerHTML = '\u{1F49C} by ClickUp Brain';
+        document.body.appendChild(credit);
+
+        var timer = null;
+        var fade = function (out) { credit.style.opacity = out ? '0' : ''; };
+        fade(true);
+        var show = function () {
+            fade(false);
+            clearTimeout(timer);
+            timer = setTimeout(function () { fade(true); }, 3000);
+        };
+        document.addEventListener('mousemove', show);
+        show();
+    }
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initChromeUI);
+    } else {
+        initChromeUI();
+    }
+})();
+
+</script>
+<!-- /skill:chrome -->
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Days Tracking Pro</title>
+  <link rel="manifest" href="./manifest.json">
+  <link rel="icon" type="image/png" href="./icon-192.png">
+  <link rel="apple-touch-icon" href="./icon-192.png">
+  <meta name="theme-color" content="#121212">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <style>
+    /* ============================================
+       RESET & BASE
+       ============================================ */
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    /* ============================================
+       CSS VARIABLES — OBSIDIAN (DARK, DEFAULT)
+       ============================================ */
+    :root {
+      --bg: oklch(12% 0.014 265);
+      --surface: oklch(22% 0.012 265 / 0.55);
+      --surface2: oklch(26% 0.011 265 / 0.5);
+      --surface3: oklch(31% 0.011 265 / 0.55);
+      --border: oklch(45% 0.012 265 / 0.32);
+      --border-md: oklch(52% 0.013 265 / 0.4);
+      --border-strong: oklch(62% 0.015 265 / 0.5);
+      --text: oklch(96% 0.008 95);
+      --text-muted: oklch(74% 0.012 95);
+      --text-dim: oklch(53% 0.01 265);
+      --accent: oklch(80% 0.12 85);
+      --accent-hover: oklch(85% 0.11 85);
+      --accent-subtle: oklch(32% 0.05 85 / 0.45);
+      --accent-border: oklch(58% 0.09 85 / 0.55);
+      --green: oklch(76% 0.14 165);
+      --green-subtle: oklch(30% 0.045 165 / 0.45);
+      --green-border: oklch(52% 0.09 165 / 0.55);
+      --red: oklch(69% 0.18 25);
+      --red-subtle: oklch(30% 0.06 25 / 0.45);
+      --red-border: oklch(52% 0.11 25 / 0.55);
+      --amber: oklch(80% 0.12 85);
+      --amber-subtle: oklch(32% 0.05 85 / 0.45);
+      --amber-border: oklch(58% 0.09 85 / 0.55);
+      --font: 'Inter', system-ui, sans-serif;
+      --mono: 'JetBrains Mono', monospace;
+      --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+      --ease-in: cubic-bezier(0.7, 0, 0.84, 0);
+      --glass-blur: blur(24px);
+      --shadow-glass: 0 8px 30px oklch(5% 0 0 / 0.4), inset 0 1px 0 oklch(100% 0 0 / 0.04);
+      --accent-ink: oklch(16% 0.01 265);
+    }
+
+    /* ============================================
+       CSS VARIABLES — IVORY (LIGHT)
+       ============================================ */
+    body[data-theme="light"] {
+      --bg: oklch(97% 0.008 90);
+      --surface: oklch(100% 0.004 90 / 0.62);
+      --surface2: oklch(99% 0.006 90 / 0.55);
+      --surface3: oklch(95% 0.008 90 / 0.6);
+      --border: oklch(80% 0.012 90 / 0.5);
+      --border-md: oklch(72% 0.014 90 / 0.55);
+      --border-strong: oklch(60% 0.016 90 / 0.6);
+      --text: oklch(19% 0.012 265);
+      --text-muted: oklch(42% 0.012 265);
+      --text-dim: oklch(58% 0.01 265);
+      --accent: oklch(56% 0.12 80);
+      --accent-hover: oklch(50% 0.13 80);
+      --accent-subtle: oklch(92% 0.05 80 / 0.55);
+      --accent-border: oklch(65% 0.1 80 / 0.5);
+      --green: oklch(48% 0.12 165);
+      --green-subtle: oklch(90% 0.045 165 / 0.55);
+      --green-border: oklch(65% 0.08 165 / 0.5);
+      --red: oklch(53% 0.18 25);
+      --red-subtle: oklch(90% 0.045 25 / 0.55);
+      --red-border: oklch(65% 0.09 25 / 0.5);
+      --amber: oklch(56% 0.12 80);
+      --amber-subtle: oklch(90% 0.045 80 / 0.55);
+      --amber-border: oklch(65% 0.08 80 / 0.5);
+      --shadow-glass: 0 8px 30px oklch(40% 0.01 265 / 0.14), inset 0 1px 0 oklch(100% 0 0 / 0.5);
+    }
+
+    /* ============================================
+       CSS VARIABLES — GRAPHITE (GREY)
+       ============================================ */
+    body[data-theme="grey"] {
+      --bg: oklch(26% 0.005 265);
+      --surface: oklch(33% 0.005 265 / 0.55);
+      --surface2: oklch(37% 0.005 265 / 0.5);
+      --surface3: oklch(42% 0.006 265 / 0.55);
+      --border: oklch(52% 0.006 265 / 0.4);
+      --border-md: oklch(58% 0.007 265 / 0.45);
+      --border-strong: oklch(68% 0.008 265 / 0.5);
+      --text: oklch(93% 0.005 265);
+      --text-muted: oklch(76% 0.007 265);
+      --text-dim: oklch(60% 0.007 265);
+      --accent: oklch(74% 0.07 85);
+      --accent-hover: oklch(79% 0.07 85);
+      --accent-subtle: oklch(42% 0.035 85 / 0.45);
+      --accent-border: oklch(58% 0.055 85 / 0.55);
+      --green: oklch(70% 0.08 165);
+      --green-subtle: oklch(40% 0.035 165 / 0.45);
+      --green-border: oklch(54% 0.055 165 / 0.55);
+      --red: oklch(64% 0.11 25);
+      --red-subtle: oklch(40% 0.045 25 / 0.45);
+      --red-border: oklch(54% 0.06 25 / 0.55);
+      --amber: oklch(74% 0.07 85);
+      --amber-subtle: oklch(42% 0.035 85 / 0.45);
+      --amber-border: oklch(58% 0.055 85 / 0.55);
+      --shadow-glass: 0 8px 30px oklch(5% 0 0 / 0.32), inset 0 1px 0 oklch(100% 0 0 / 0.03);
+    }
+
+    /* ============================================
+       BODY
+       ============================================ */
+    body {
+      font-family: var(--font);
+      background: var(--bg);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      color: var(--text);
+      padding: 40px 20px 80px;
+      transition: background 0.4s var(--ease-out), color 0.3s;
+      font-optical-sizing: auto;
+      line-height: 1.5;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 0;
+      background:
+        radial-gradient(ellipse 70% 55% at 15% 8%, oklch(55% 0.09 85 / 0.14), transparent),
+        radial-gradient(ellipse 60% 50% at 85% 92%, oklch(40% 0.07 200 / 0.1), transparent);
+    }
+
+    body[data-theme="light"]::before {
+      background:
+        radial-gradient(ellipse 70% 55% at 15% 8%, oklch(75% 0.06 85 / 0.28), transparent),
+        radial-gradient(ellipse 60% 50% at 85% 92%, oklch(80% 0.04 200 / 0.18), transparent);
+    }
+
+    body[data-theme="grey"]::before {
+      background:
+        radial-gradient(ellipse 70% 55% at 15% 8%, oklch(55% 0.05 85 / 0.12), transparent),
+        radial-gradient(ellipse 60% 50% at 85% 92%, oklch(50% 0.04 200 / 0.09), transparent);
+    }
+
+    /* ============================================
+       GLASS SURFACES (signature treatment)
+       ============================================ */
+    .nav-bar,
+    .tracker-section,
+    .history-section,
+    .modal-content,
+    .day-box,
+    .stat-card,
+    #login-screen {
+      backdrop-filter: var(--glass-blur);
+      -webkit-backdrop-filter: var(--glass-blur);
+      box-shadow: var(--shadow-glass);
+    }
+
+    #login-screen {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 32px 28px;
+      margin-top: 8vh;
+    }
+
+    .login-input,
+    .complaint-textarea,
+    .btn-ghost,
+    .notif-toggle,
+    .theme-pill,
+    .habit-name-input,
+    .adjust-panel,
+    .field-group select,
+    .field-group input[type="number"],
+    .field-group input[type="text"],
+    .timer-preset-btn,
+    .action-btn,
+    .history-item,
+    .toast {
+      backdrop-filter: var(--glass-blur);
+      -webkit-backdrop-filter: var(--glass-blur);
+    }
+
+
+    .container {
+      width: 100%;
+      max-width: 960px;
+      display: none;
+      flex-direction: column;
+      gap: 24px;
+      position: relative;
+      z-index: 1;
+    }
+
+    #login-screen {
+      display: none;
+      width: 100%;
+      max-width: 400px;
+      margin-top: 10vh;
+      flex-direction: column;
+      position: relative;
+      z-index: 1;
+    }
+
+    .active-screen {
+      display: flex !important;
+    }
+
+    /* ============================================
+       LOGIN SCREEN
+       ============================================ */
+    .login-brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 40px;
+    }
+
+    .login-logo {
+      width: 36px;
+      height: 36px;
+      background: var(--accent);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      color: white;
+    }
+
+    .login-brand-name {
+      font-size: 0.875rem;
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    .login-brand-sub {
+      font-size: 0.68rem;
+      color: var(--text-dim);
+      font-family: var(--mono);
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+
+    .login-heading {
+      font-size: 2rem;
+      font-weight: 800;
+      letter-spacing: -0.04em;
+      color: var(--text);
+      margin-bottom: 8px;
+      line-height: 1.1;
+    }
+
+    .login-sub {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      margin-bottom: 32px;
+      line-height: 1.5;
+    }
+
+    .field-label {
+      font-size: 0.7rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 6px;
+      display: block;
+      font-family: var(--mono);
+    }
+
+    .field-wrap {
+      margin-bottom: 16px;
+    }
+
+    .login-input,
+    .complaint-textarea {
+      width: 100%;
+      padding: 12px 14px;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      font-size: 0.9rem;
+      font-family: var(--font);
+      color: var(--text);
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
+    }
+
+    .login-input:focus,
+    .complaint-textarea:focus {
+      border-color: var(--accent);
+      background: var(--surface);
+      box-shadow: 0 0 0 3px var(--accent-subtle);
+    }
+
+    .login-input::placeholder,
+    .complaint-textarea::placeholder {
+      color: var(--text-dim);
+    }
+
+    .divider-text {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin: 20px 0;
+      font-size: 0.72rem;
+      color: var(--text-dim);
+      font-weight: 600;
+      font-family: var(--mono);
+    }
+
+    .divider-text::before,
+    .divider-text::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+    }
+
+    /* ============================================
+       NAVBAR
+       ============================================ */
+    .nav-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: var(--surface);
+      padding: 16px 24px;
+      border-radius: 16px;
+      border: 1px solid var(--border);
+    }
+
+    .nav-brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .nav-logo {
+      width: 28px;
+      height: 28px;
+      background: var(--accent);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      color: white;
+    }
+
+    .nav-greeting {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    .nav-email {
+      font-size: 0.7rem;
+      color: var(--text-dim);
+      font-family: var(--mono);
+    }
+
+    .nav-right {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    /* ============================================
+       SYNC INDICATOR
+       ============================================ */
+    .sync-indicator {
+      font-size: 0.65rem;
+      font-family: var(--mono);
+      padding: 3px 8px;
+      border-radius: 6px;
+      font-weight: 600;
+    }
+
+    .sync-ok {
+      color: var(--green);
+      background: var(--green-subtle);
+      border: 1px solid var(--green-border);
+    }
+
+    .sync-off {
+      color: var(--red);
+      background: var(--red-subtle);
+      border: 1px solid var(--red-border);
+    }
+
+    .sync-ing {
+      color: var(--amber);
+      background: var(--amber-subtle);
+      border: 1px solid var(--amber-border);
+      animation: pulse 1.5s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+
+    /* ============================================
+       BUTTONS
+       ============================================ */
+    .btn {
+      border: none;
+      border-radius: 999px;
+      font-weight: 600;
+      font-size: 0.85rem;
+      cursor: pointer;
+      transition: all 0.2s var(--ease-out);
+      display: inline-flex;
+      justify-content: center;
+      align-items: center;
+      gap: 6px;
+      font-family: var(--font);
+      white-space: nowrap;
+    }
+
+    .btn-full {
+      width: 100%;
+      padding: 13px 20px;
+    }
+
+    .btn-sm {
+      padding: 9px 14px;
+      font-size: 0.8rem;
+    }
+
+    .btn-xs {
+      padding: 6px 11px;
+      font-size: 0.75rem;
+    }
+
+    .btn-primary {
+      background: var(--accent);
+      color: var(--accent-ink);
+      border: 1px solid transparent;
+      font-weight: 700;
+    }
+
+    .btn-primary:hover {
+      background: var(--accent-hover);
+      transform: translateY(-1px);
+      box-shadow: 0 6px 20px -4px var(--accent);
+    }
+
+    .btn-primary:active {
+      transform: translateY(0);
+      box-shadow: none;
+    }
+
+    .btn-ghost {
+      background: var(--surface2);
+      color: var(--text-muted);
+      border: 1px solid var(--border);
+    }
+
+    .btn-ghost:hover {
+      background: var(--surface3);
+      color: var(--text);
+      border-color: var(--border-md);
+    }
+
+    .btn-warn {
+      background: oklch(25% 0.04 80);
+      color: var(--amber);
+      border: 1px solid oklch(40% 0.08 80);
+    }
+
+    .btn-warn:hover {
+      background: oklch(30% 0.05 80);
+    }
+
+    .btn-danger-soft {
+      background: var(--red-subtle);
+      color: var(--red);
+      border: 1px solid var(--red-border);
+    }
+
+    .btn-danger-soft:hover {
+      opacity: 0.8;
+    }
+
+    .btn:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+      transform: none !important;
+    }
+
+    /* ============================================
+       NOTIFICATION TOGGLE
+       ============================================ */
+    .notif-toggle {
+      font-size: 0.72rem;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: var(--mono);
+      padding: 4px 10px;
+      border-radius: 6px;
+      transition: all 0.2s var(--ease-out);
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+      background: var(--surface2);
+    }
+
+    .notif-toggle.active {
+      color: var(--green);
+      background: var(--green-subtle);
+      border-color: var(--green-border);
+    }
+
+    /* ============================================
+       THEME PILL
+       ============================================ */
+    .theme-pill {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      padding: 7px 12px;
+      border-radius: 999px;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      cursor: pointer;
+      color: var(--text-muted);
+      transition: all 0.2s;
+      font-family: var(--font);
+    }
+
+    .theme-pill:hover {
+      background: var(--surface3);
+      color: var(--text);
+    }
+
+    /* ============================================
+       TRACKER SECTION
+       ============================================ */
+    .tracker-section {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 32px;
+    }
+
+    .tracker-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 28px;
+      gap: 16px;
+    }
+
+    .tracker-left {
+      flex: 1;
+    }
+
+    .habit-name-input {
+      width: 100%;
+      border: none;
+      background: transparent;
+      font-size: 1.75rem;
+      font-weight: 800;
+      color: var(--text);
+      outline: none;
+      padding: 4px 0;
+      border-radius: 6px;
+      transition: all 0.2s;
+      letter-spacing: -0.03em;
+      font-family: var(--font);
+      line-height: 1.2;
+    }
+
+    .habit-name-input:hover,
+    .habit-name-input:focus {
+      background: var(--surface2);
+      padding: 4px 8px;
+    }
+
+    .tracker-meta {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-top: 8px;
+      flex-wrap: wrap;
+    }
+
+    #month-year-display {
+      font-size: 0.72rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      font-family: var(--mono);
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+
+    /* ============================================
+       ADJUST TOGGLES
+       ============================================ */
+    .adjust-toggle {
+      font-size: 0.72rem;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: var(--mono);
+      padding: 4px 10px;
+      border-radius: 6px;
+      transition: all 0.2s var(--ease-out);
+      border: none;
+    }
+
+    .adjust-toggle.date-toggle {
+      color: var(--accent);
+      background: var(--accent-subtle);
+      border: 1px solid var(--accent-border);
+    }
+
+    .adjust-toggle.timer-toggle {
+      color: var(--amber);
+      background: oklch(25% 0.04 80);
+      border: 1px solid oklch(40% 0.08 80);
+    }
+
+    .current-timer-display {
+      font-size: 0.68rem;
+      font-family: var(--mono);
+      color: var(--amber);
+      font-weight: 600;
+      padding: 3px 8px;
+      border-radius: 6px;
+      background: var(--amber-subtle);
+      border: 1px solid var(--amber-border);
+    }
+
+    .streak-badge {
+      font-size: 0.68rem;
+      font-family: var(--mono);
+      color: var(--amber);
+      font-weight: 600;
+      padding: 3px 8px;
+      border-radius: 6px;
+      background: var(--amber-subtle);
+      border: 1px solid var(--amber-border);
+    }
+
+    /* ============================================
+       ADJUST PANELS
+       ============================================ */
+    .adjust-panel {
+      display: none;
+      background: var(--surface2);
+      border: 1px solid var(--border-md);
+      border-radius: 12px;
+      padding: 16px 20px;
+      margin-top: 16px;
+      gap: 12px;
+      align-items: flex-end;
+      flex-wrap: wrap;
+    }
+
+    .adjust-panel.open {
+      display: flex;
+      animation: slideDown 0.3s var(--ease-out);
+    }
+
+    @keyframes slideDown {
+      from { opacity: 0; transform: translateY(-8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .field-group {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .field-group label {
+      font-size: 0.65rem;
+      font-weight: 600;
+      color: var(--text-dim);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      font-family: var(--mono);
+    }
+
+    .field-group select,
+    .field-group input[type="number"],
+    .field-group input[type="text"] {
+      padding: 8px 10px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font-size: 0.82rem;
+      font-family: var(--font);
+      color: var(--text);
+      outline: none;
+      min-width: 80px;
+    }
+
+    .panel-actions {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+
+    /* ============================================
+       TIMER PRESETS
+       ============================================ */
+    .timer-presets {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      width: 100%;
+    }
+
+    .timer-preset-btn {
+      padding: 6px 12px;
+      font-size: 0.72rem;
+      font-weight: 600;
+      font-family: var(--mono);
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: all 0.2s var(--ease-out);
+    }
+
+    .timer-preset-btn:hover {
+      border-color: var(--amber);
+      color: var(--amber);
+      background: oklch(25% 0.04 80);
+    }
+
+    .timer-preset-btn.active {
+      border-color: var(--amber);
+      color: var(--amber);
+      background: oklch(25% 0.04 80);
+    }
+
+    .timer-custom-row {
+      display: flex;
+      align-items: flex-end;
+      gap: 8px;
+      width: 100%;
+      margin-top: 4px;
+    }
+
+    .timer-custom-row .field-group {
+      flex: 1;
+    }
+
+    /* ============================================
+       CALENDAR GRID
+       ============================================ */
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 8px;
+    }
+
+    .day-box {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 14px 8px 12px;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      min-height: 108px;
+      transition: all 0.2s var(--ease-out);
+      position: relative;
+      overflow: hidden;
+      animation: dayIn 0.4s var(--ease-out) both;
+    }
+
+    .day-box:hover {
+      border-color: var(--border-strong);
+      transform: translateY(-2px);
+    }
+
+    .day-box.fading-out {
+      opacity: 0.35;
+      transform: scale(0.96);
+    }
+
+    @keyframes dayIn {
+      from { opacity: 0; transform: translateY(8px) scale(0.94); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    .day-name {
+      font-size: 0.6rem;
+      color: var(--text-dim);
+      text-transform: uppercase;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      font-family: var(--mono);
+    }
+
+    .date-num {
+      font-size: 1.4rem;
+      font-weight: 800;
+      color: var(--text);
+      margin: 4px 0 8px;
+      line-height: 1;
+      transition: color 0.2s;
+    }
+
+    /* ============================================
+       TIMER BADGES
+       ============================================ */
+    .timer-badge {
+      position: absolute;
+      top: 6px;
+      right: 6px;
+      font-size: 0.55rem;
+      font-family: var(--mono);
+      font-weight: 600;
+      color: var(--amber);
+      background: var(--amber-subtle);
+      padding: 2px 5px;
+      border-radius: 4px;
+      border: 1px solid var(--amber-border);
+    }
+
+    .timer-badge.urgent {
+      color: var(--red);
+      background: var(--red-subtle);
+      border-color: var(--red-border);
+      animation: pulse 1s infinite;
+    }
+
+    .timer-badge.expired {
+      color: var(--red);
+      background: var(--red-subtle);
+      border-color: var(--red-border);
+    }
+
+    /* ============================================
+       ACTION BUTTONS (CHECK / CROSS)
+       ============================================ */
+    .action-space {
+      display: flex;
+      gap: 4px;
+      justify-content: center;
+    }
+
+    .action-btn {
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 6px 0;
+      width: 100%;
+      font-weight: 700;
+      font-size: 0.85rem;
+      cursor: pointer;
+      transition: all 0.2s var(--ease-out);
+      background: var(--surface3);
+      color: var(--text-dim);
+      font-family: var(--font);
+    }
+
+    .action-btn:hover {
+      border-color: var(--border-strong);
+      color: var(--text-muted);
+      transform: scale(1.08);
+    }
+
+    .action-btn:active {
+      transform: scale(0.95);
+    }
+
+    /* ============================================
+       DAY STATES
+       ============================================ */
+    .state-checked {
+      background: var(--green-subtle);
+      border-color: var(--green-border);
+      animation: checkPop 0.4s var(--ease-out);
+    }
+
+    .state-checked .date-num {
+      color: var(--green);
+    }
+
+    .state-checked .btn-check {
+      background: var(--green);
+      color: white;
+      border-color: var(--green);
+    }
+
+    .state-crossed {
+      background: var(--red-subtle);
+      border-color: var(--red-border);
+      animation: crossShake 0.4s var(--ease-out);
+    }
+
+    .state-crossed .date-num {
+      color: var(--red);
+    }
+
+    .state-crossed .btn-cross {
+      background: var(--red);
+      color: white;
+      border-color: var(--red);
+    }
+
+    /* Momentum glow — the tail of consecutive checked days lights up
+       with the accent, so an active streak reads as one glowing chain. */
+    .day-box.in-streak {
+      border-color: var(--accent-border);
+      box-shadow: var(--shadow-glass), 0 0 0 1px var(--accent-border), 0 0 22px -6px var(--accent);
+    }
+
+    .day-box.in-streak .date-num {
+      color: var(--accent);
+    }
+
+    @keyframes checkPop {
+      0% { transform: scale(0.95); }
+      50% { transform: scale(1.03); }
+      100% { transform: scale(1); }
+    }
+
+    @keyframes crossShake {
+      0% { transform: translateX(0); }
+      25% { transform: translateX(-3px); }
+      50% { transform: translateX(3px); }
+      75% { transform: translateX(-2px); }
+      100% { transform: translateX(0); }
+    }
+
+    /* ============================================
+       STATS BAR
+       ============================================ */
+    .stats-bar {
+      display: flex;
+      gap: 16px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+
+    .stat-card {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 12px 16px;
+      flex: 1;
+      min-width: 100px;
+      text-align: center;
+      transition: all 0.2s var(--ease-out);
+    }
+
+    .stat-card:hover {
+      transform: translateY(-2px);
+    }
+
+    .stat-value {
+      font-size: 1.5rem;
+      font-weight: 800;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .stat-value.green { color: var(--green); }
+    .stat-value.red { color: var(--red); }
+    .stat-value.amber { color: var(--amber); }
+
+    .stat-label {
+      font-size: 0.62rem;
+      font-weight: 600;
+      color: var(--text-dim);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      font-family: var(--mono);
+      margin-top: 2px;
+    }
+
+    /* ============================================
+       PROGRESS BAR
+       ============================================ */
+    .progress-wrap {
+      width: 100%;
+      height: 6px;
+      background: var(--surface3);
+      border-radius: 999px;
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      height: 100%;
+      border-radius: 999px;
+      transition: width 0.6s var(--ease-out), background 0.3s;
+      background: var(--green);
+    }
+
+    /* ============================================
+       HISTORY SECTION
+       ============================================ */
+    .history-section {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 28px 32px;
+    }
+
+    .section-label {
+      font-size: 0.68rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--text-dim);
+      font-family: var(--mono);
+      margin-bottom: 16px;
+    }
+
+    #history-log {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .history-item {
+      background: var(--surface2);
+      padding: 16px 20px;
+      border-radius: 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border: 1px solid var(--border);
+      transition: all 0.2s var(--ease-out);
+    }
+
+    .history-item:hover {
+      border-color: var(--accent-border);
+      transform: translateX(4px);
+    }
+
+    .history-info strong {
+      display: block;
+      font-size: 0.9rem;
+      color: var(--text);
+      margin-bottom: 4px;
+      font-weight: 600;
+    }
+
+    .history-stats {
+      display: flex;
+      gap: 12px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      font-family: var(--mono);
+    }
+
+    .stat-green { color: var(--green); }
+    .stat-red { color: var(--red); }
+
+    .history-actions {
+      display: flex;
+      gap: 6px;
+    }
+
+    /* ============================================
+       STATUS MESSAGES
+       ============================================ */
+    .status-msg {
+      font-size: 0.75rem;
+      font-weight: 600;
+      margin-bottom: 14px;
+      padding: 10px 14px;
+      border-radius: 10px;
+      display: none;
+      line-height: 1.4;
+      font-family: var(--mono);
+    }
+
+    .status-success {
+      display: block;
+      background: var(--green-subtle);
+      color: var(--green);
+      border: 1px solid var(--green-border);
+    }
+
+    .status-error {
+      display: block;
+      background: var(--red-subtle);
+      color: var(--red);
+      border: 1px solid var(--red-border);
+    }
+
+    /* ============================================
+       MODALS
+       ============================================ */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: oklch(5% 0.01 270 / 0.75);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+      padding: 20px;
+    }
+
+    .modal-overlay.active {
+      display: flex;
+    }
+
+    .modal-content {
+      background: var(--surface);
+      padding: 32px;
+      border-radius: 20px;
+      width: 100%;
+      max-width: 460px;
+      border: 1px solid var(--border-md);
+      animation: modalIn 0.3s var(--ease-out);
+    }
+
+    @keyframes modalIn {
+      from { opacity: 0; transform: scale(0.96) translateY(8px); }
+      to { opacity: 1; transform: scale(1) translateY(0); }
+    }
+
+    .modal-content h3 {
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 8px;
+    }
+
+    .modal-content p {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      line-height: 1.55;
+      margin-bottom: 22px;
+    }
+
+    .modal-buttons {
+      display: flex;
+      gap: 10px;
+      justify-content: flex-end;
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      padding-bottom: 16px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .readonly-day {
+      min-height: 70px;
+      justify-content: center;
+      gap: 2px;
+      cursor: default;
+    }
+
+    .readonly-day:hover {
+      transform: none;
+      border-color: var(--border);
+    }
+
+    /* ============================================
+       MISC UI
+       ============================================ */
+    .chip {
+      display: inline-flex;
+      align-items: center;
+      font-size: 0.68rem;
+      font-weight: 600;
+      font-family: var(--mono);
+      padding: 3px 8px;
+      border-radius: 999px;
+      background: var(--accent-subtle);
+      color: var(--accent);
+      border: 1px solid var(--accent-border);
+    }
+
+    .complaint-textarea {
+      min-height: 110px;
+      resize: vertical;
+      margin-bottom: 6px;
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 32px 16px;
+      color: var(--text-dim);
+      font-size: 0.82rem;
+      font-family: var(--mono);
+    }
+
+    .modal-scroll {
+      max-height: 80vh;
+      overflow-y: auto;
+    }
+
+    /* ============================================
+       TOAST NOTIFICATIONS
+       ============================================ */
+    .toast {
+      position: fixed;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%) translateY(100px);
+      background: var(--surface);
+      border: 1px solid var(--border-md);
+      border-radius: 12px;
+      padding: 12px 20px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: var(--text);
+      z-index: 2000;
+      opacity: 0;
+      transition: all 0.4s var(--ease-out);
+      pointer-events: none;
+      box-shadow: 0 8px 32px oklch(0% 0 0 / 0.3);
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    .toast.toast-success {
+      border-color: var(--green-border);
+      color: var(--green);
+    }
+
+    .toast.toast-error {
+      border-color: var(--red-border);
+      color: var(--red);
+    }
+
+    /* ============================================
+       RESPONSIVE
+       ============================================ */
+    @media (max-width: 768px) {
+      .grid {
+        grid-template-columns: repeat(4, 1fr);
+      }
+
+      .tracker-header {
+        flex-direction: column;
+        gap: 12px;
+      }
+
+      .tracker-section,
+      .history-section {
+        padding: 20px;
+      }
+    }
+
+    @media (max-width: 520px) {
+      .grid {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 6px;
+      }
+
+      .nav-bar {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+        padding: 16px;
+      }
+
+      .nav-right {
+        width: 100%;
+        flex-wrap: wrap;
+      }
+
+      .history-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+      }
+
+      .adjust-panel {
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      body {
+        padding: 20px 12px 60px;
+      }
+
+      .stats-bar {
+        flex-direction: column;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ============================================
+       TOAST ELEMENT
+       ============================================ -->
+  <div class="toast" id="toast"></div>
+
+  <!-- ============================================
+       LOGIN SCREEN
+       ============================================ -->
+  <div id="login-screen" class="active-screen">
+    <div class="login-brand">
+      <div class="login-logo">&#9670;</div>
+      <div>
+        <div class="login-brand-name">Days Tracking Pro</div>
+        <div class="login-brand-sub">Cloud Sync &middot; Notifications</div>
+      </div>
+      <button class="theme-pill" style="margin-left:auto" id="login-theme-toggle" onclick="toggleTheme()">&#9728; Light</button>
+    </div>
+
+    <div class="login-heading">Welcome back</div>
+    <p class="login-sub">Your progress syncs to the cloud. Get notified when you forget to mark a day.</p>
+
+    <div id="login-status" class="status-msg"></div>
+
+    <div class="field-wrap">
+      <label class="field-label">Name</label>
+      <input type="text" id="username-input" class="login-input" placeholder="Your name">
+    </div>
+
+    <div class="field-wrap">
+      <label class="field-label">Email</label>
+      <input type="email" id="useremail-input" class="login-input" placeholder="you@example.com">
+    </div>
+
+    <button class="btn btn-primary btn-full" onclick="login()">Access Dashboard</button>
+    <div class="divider-text">OR</div>
+    <button class="btn btn-ghost btn-full" onclick="login('Guest','guest@local.app')">Continue as Guest (no sync)</button>
+  </div>
+
+  <!-- ============================================
+       APP SCREEN
+       ============================================ -->
+  <div id="app-screen" class="container">
+
+    <!-- Navbar -->
+    <div class="nav-bar">
+      <div class="nav-brand">
+        <div class="nav-logo">&#9670;</div>
+        <div>
+          <div class="nav-greeting" id="greeting-name"></div>
+          <div class="nav-email" id="greeting-email"></div>
+        </div>
+      </div>
+      <div class="nav-right">
+        <span class="sync-indicator sync-ok" id="sync-status">&#9679; Synced</span>
+        <button class="notif-toggle" id="notif-toggle" onclick="toggleNotifications()">&#128276; Notify</button>
+        <button class="theme-pill" id="theme-toggle" onclick="toggleTheme()">&#9728; Light</button>
+        <button class="btn btn-warn btn-sm" onclick="openComplaintModal()">&#9873; Report</button>
+        <button class="btn btn-ghost btn-sm" onclick="logout()">Sign out</button>
+      </div>
+    </div>
+
+    <!-- Tracker Section -->
+    <div class="tracker-section">
+      <div class="tracker-header">
+        <div class="tracker-left">
+          <input type="text" id="habit-name-input" class="habit-name-input" value="My Habit">
+
+          <div class="tracker-meta">
+            <span id="month-year-display">Loading...</span>
+            <button class="adjust-toggle date-toggle" onclick="toggleDateAdjust()">&#9881; Date</button>
+            <button class="adjust-toggle timer-toggle" onclick="toggleTimerAdjust()">&#9202; Timer</button>
+            <span class="current-timer-display" id="current-timer-label">23h</span>
+            <span class="streak-badge" id="streak-badge" style="display:none">&#128293; 0</span>
+          </div>
+
+          <!-- Date Adjust Panel -->
+          <div class="adjust-panel" id="date-adjust-panel">
+            <div class="field-group">
+              <label>Start Day</label>
+              <input type="number" id="adj-day" min="1" max="31" value="1">
+            </div>
+            <div class="field-group">
+              <label>Month</label>
+              <select id="adj-month">
+                <option value="0">Jan</option>
+                <option value="1">Feb</option>
+                <option value="2">Mar</option>
+                <option value="3">Apr</option>
+                <option value="4">May</option>
+                <option value="5">Jun</option>
+                <option value="6">Jul</option>
+                <option value="7">Aug</option>
+                <option value="8">Sep</option>
+                <option value="9">Oct</option>
+                <option value="10">Nov</option>
+                <option value="11">Dec</option>
+              </select>
+            </div>
+            <div class="field-group">
+              <label>Year</label>
+              <input type="number" id="adj-year" min="2020" max="2099" value="2026">
+            </div>
+            <div class="field-group">
+              <label>Days</label>
+              <input type="number" id="adj-days-count" min="1" max="366" value="30">
+            </div>
+            <div class="panel-actions">
+              <button class="btn btn-primary btn-xs" onclick="applyDateAdjust()">Apply</button>
+              <button class="btn btn-ghost btn-xs" onclick="resetToDefault()">Default</button>
+            </div>
+          </div>
+
+          <!-- Timer Adjust Panel -->
+          <div class="adjust-panel" id="timer-adjust-panel">
+            <div class="timer-presets">
+              <button class="timer-preset-btn" data-ms="5000" onclick="setTimerPreset(this)">5s</button>
+              <button class="timer-preset-btn" data-ms="60000" onclick="setTimerPreset(this)">1m</button>
+              <button class="timer-preset-btn" data-ms="300000" onclick="setTimerPreset(this)">5m</button>
+              <button class="timer-preset-btn" data-ms="1800000" onclick="setTimerPreset(this)">30m</button>
+              <button class="timer-preset-btn" data-ms="3600000" onclick="setTimerPreset(this)">1h</button>
+              <button class="timer-preset-btn" data-ms="18000000" onclick="setTimerPreset(this)">5h</button>
+              <button class="timer-preset-btn" data-ms="36000000" onclick="setTimerPreset(this)">10h</button>
+              <button class="timer-preset-btn" data-ms="82800000" onclick="setTimerPreset(this)">23h</button>
+              <button class="timer-preset-btn" data-ms="86400000" onclick="setTimerPreset(this)">24h</button>
+              <button class="timer-preset-btn" data-ms="never" onclick="setTimerPreset(this)">Never</button>
+            </div>
+            <div class="timer-custom-row">
+              <div class="field-group">
+                <label>Custom (e.g. 2h 30m)</label>
+                <input type="text" id="custom-timer-input" placeholder="e.g. 2h 30m">
+              </div>
+              <button class="btn btn-primary btn-xs" onclick="applyCustomTimer()">Set</button>
+            </div>
+          </div>
+        </div>
+
+        <button class="btn btn-primary btn-sm" onclick="openConfirmModal()">End &amp; Save &rarr;</button>
+      </div>
+
+      <!-- Stats -->
+      <div class="stats-bar">
+        <div class="stat-card">
+          <div class="stat-value green" id="stat-checked">0</div>
+          <div class="stat-label">Checked</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value red" id="stat-crossed">0</div>
+          <div class="stat-label">Crossed</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value amber" id="stat-pending">0</div>
+          <div class="stat-label">Pending</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value" id="stat-rate">0%</div>
+          <div class="stat-label">Success</div>
+        </div>
+      </div>
+
+      <!-- Progress Bar -->
+      <div class="progress-wrap">
+        <div class="progress-fill" id="progress-fill" style="width:0%"></div>
+      </div>
+
+      <!-- Calendar Grid -->
+      <div class="grid" id="days-grid" style="margin-top:20px"></div>
+    </div>
+
+    <!-- History Section -->
+    <div class="history-section">
+      <div class="section-label">History Log</div>
+      <div id="history-log">
+        <div class="empty-state">No records yet.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================
+       MODALS
+       ============================================ -->
+
+  <!-- End Cycle Modal -->
+  <div class="modal-overlay" id="confirm-modal">
+    <div class="modal-content">
+      <h3>End this cycle?</h3>
+      <p>Saves current data to history and starts fresh.</p>
+      <div class="modal-buttons">
+        <button class="btn btn-ghost btn-sm" onclick="closeModals()">Cancel</button>
+        <button class="btn btn-primary btn-sm" onclick="confirmEndMonth()">Save &amp; Continue</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- View Record Modal -->
+  <div class="modal-overlay" id="view-modal">
+    <div class="modal-content" style="max-width:880px">
+      <div class="modal-header">
+        <h3 id="view-modal-title">Record</h3>
+        <button class="btn btn-ghost btn-sm" onclick="closeModals()">Close</button>
+      </div>
+      <div class="grid" id="view-days-grid"></div>
+    </div>
+  </div>
+
+  <!-- Delete Record Modal -->
+  <div class="modal-overlay" id="delete-modal">
+    <div class="modal-content">
+      <h3>Delete this record?</h3>
+      <p>Cannot be undone.</p>
+      <div class="modal-buttons">
+        <button class="btn btn-ghost btn-sm" onclick="closeModals()">Cancel</button>
+        <button class="btn btn-danger-soft btn-sm" onclick="confirmDeleteRecord()">Delete</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Report/Complaint Modal -->
+  <div class="modal-overlay" id="complaint-modal">
+    <div class="modal-content">
+      <h3>Report an Issue</h3>
+      <p>Describe the problem below. It goes straight to our inbox.</p>
+      <div id="complaint-status" class="status-msg"></div>
+      <textarea id="complaint-text" class="complaint-textarea" placeholder="What went wrong?"></textarea>
+      <div class="modal-buttons" id="complaint-actions" style="margin-top:12px">
+        <button class="btn btn-ghost btn-sm" onclick="closeModals()">Cancel</button>
+        <button class="btn btn-primary btn-sm" onclick="submitComplaint()">Send</button>
+      </div>
+      <div id="complaint-close-wrap" style="display:none;margin-top:12px">
+        <button class="btn btn-ghost btn-sm" style="width:100%" onclick="closeModals()">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================
+       JAVASCRIPT
+       ============================================ -->
+  <script>
+    (function () {
+      'use strict';
+
+      // ==========================================
+      // CONFIGURATION
+      // ==========================================
+      var SUPABASE_URL = 'https://mffmqfmfmiqaamrvkxky.supabase.co';
+      var SUPABASE_KEY = 'sb_publishable_wHHLJsD06iUEDbs1fTnk4w_jd3030yf';
+      var sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+      var DEFAULT_FADE = 23 * 3600000;
+      var MO = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+      var DS = ['SU', 'MO', 'TU', 'WE', 'TH', 'FR', 'SA'];
+
+      // ==========================================
+      // STATE
+      // ==========================================
+      var userData = null;
+      var activeEmail = null;
+      var cInterval = null;
+      var delIdx = null;
+      var syncTimer = null;
+      var notifInterval = null;
+      var isOnline = navigator.onLine;
+
+      // ==========================================
+      // CLOUD SYNC
+      // ==========================================
+      var lastCloudUpdatedAt = null;
+      var pullTimer = null;
+
+      function setSS(s) {
+        var e = document.getElementById('sync-status');
+        if (!e) return;
+        if (s === 'synced') {
+          e.className = 'sync-indicator sync-ok';
+          e.innerHTML = '&#9679; Synced';
+        } else if (s === 'syncing') {
+          e.className = 'sync-indicator sync-ing';
+          e.innerHTML = '&#9679; Syncing...';
+        } else if (s === 'guest') {
+          e.className = 'sync-indicator sync-off';
+          e.innerHTML = '&#9679; Local only (guest)';
+        } else {
+          e.className = 'sync-indicator sync-off';
+          e.innerHTML = '&#9679; Offline';
+        }
+      }
+
+      function isGuest(email) {
+        return !email || email === 'guest@local.app';
+      }
+
+      function pushCloud(retrying) {
+        if (isGuest(activeEmail) || !userData) return;
+        if (!isOnline) { setSS('offline'); return; }
+        var email = activeEmail;
+        setSS('syncing');
+        var uid = email.toLowerCase().replace(/[^a-z0-9]/g, '_');
+        var nowIso = new Date().toISOString();
+        sb.from('user_data').upsert({
+          user_id: uid,
+          email: email,
+          data: userData,
+          updated_at: nowIso
+        }, { onConflict: 'user_id' }).then(function (r) {
+          if (activeEmail !== email) return; // user switched accounts mid-flight
+          if (r.error) {
+            console.error('Cloud sync error:', r.error);
+            if (!retrying) { setTimeout(function () { pushCloud(true); }, 4000); }
+            else setSS('offline');
+            return;
+          }
+          lastCloudUpdatedAt = nowIso;
+          setSS('synced');
+        }).catch(function (err) {
+          console.error('Cloud sync failed:', err);
+          if (activeEmail !== email) return;
+          if (!retrying) { setTimeout(function () { pushCloud(true); }, 4000); }
+          else setSS('offline');
+        });
+      }
+
+      function syncCloud() {
+        if (isGuest(activeEmail) || !userData) { if (isGuest(activeEmail)) setSS('guest'); return; }
+        if (!isOnline) { setSS('offline'); return; }
+        if (syncTimer) clearTimeout(syncTimer);
+        syncTimer = setTimeout(function () { pushCloud(false); }, 1500);
+      }
+
+      function loadCloud(email, cb) {
+        if (isGuest(email)) { setSS('guest'); cb(null); return; }
+        if (!isOnline) { setSS('offline'); cb(null); return; }
+        var uid = email.toLowerCase().replace(/[^a-z0-9]/g, '_');
+        setSS('syncing');
+        // maybeSingle() (not single()) so a brand-new account with no cloud
+        // row yet doesn't get treated as an error.
+        sb.from('user_data').select('data, updated_at').eq('user_id', uid).maybeSingle().then(function (r) {
+          if (r.error) {
+            console.error('Cloud load error:', r.error);
+            setSS('offline');
+            cb(null);
+            return;
+          }
+          setSS('synced');
+          if (r.data && r.data.updated_at) lastCloudUpdatedAt = r.data.updated_at;
+          cb(r.data && r.data.data ? r.data.data : null);
+        }).catch(function (err) {
+          console.error('Cloud load failed:', err);
+          setSS('offline');
+          cb(null);
+        });
+      }
+
+      // Pull remote changes made from another device on the same account.
+      // Only adopts the remote copy if it's actually newer than what we have.
+      function pullCloud() {
+        if (isGuest(activeEmail) || !userData || !isOnline) return;
+        var email = activeEmail;
+        var uid = email.toLowerCase().replace(/[^a-z0-9]/g, '_');
+        sb.from('user_data').select('data, updated_at').eq('user_id', uid).maybeSingle().then(function (r) {
+          if (r.error || !r.data || activeEmail !== email) return;
+          if (lastCloudUpdatedAt && new Date(r.data.updated_at) <= new Date(lastCloudUpdatedAt)) return;
+          if (!r.data.data) return;
+          lastCloudUpdatedAt = r.data.updated_at;
+          var name = userData.profileName;
+          userData = r.data.data;
+          userData.profileName = name;
+          ensure(userData);
+          saveLocal();
+          initTracker();
+          renderHistory();
+          setSS('synced');
+          toast('Synced changes from another device.', '');
+        }).catch(function (err) { console.error('Cloud pull failed:', err); });
+      }
+
+      function startPullPolling() {
+        stopPullPolling();
+        pullTimer = setInterval(pullCloud, 45000);
+      }
+
+      function stopPullPolling() {
+        if (pullTimer) { clearInterval(pullTimer); pullTimer = null; }
+      }
+
+      window.addEventListener('online', function () { isOnline = true; syncCloud(); pullCloud(); });
+      window.addEventListener('offline', function () { isOnline = false; setSS(isGuest(activeEmail) ? 'guest' : 'offline'); });
+      document.addEventListener('visibilitychange', function () {
+        if (!document.hidden) { isOnline = navigator.onLine; pullCloud(); }
+      });
+
+      // ==========================================
+      // LOCAL STORAGE
+      // ==========================================
+      function saveLocal() {
+        if (!activeEmail || !userData) return;
+        try {
+          localStorage.setItem('dtp_' + activeEmail, JSON.stringify(userData));
+          localStorage.setItem('dtp_active', activeEmail);
+          if (!isGuest(activeEmail)) {
+            localStorage.setItem('dtp_lastedit_' + activeEmail, String(Date.now()));
+          }
+        } catch (e) { }
+      }
+
+      function loadLocal(e) {
+        try {
+          var s = localStorage.getItem('dtp_' + e);
+          return s ? JSON.parse(s) : null;
+        } catch (x) {
+          return null;
+        }
+      }
+
+      function saveAll() {
+        saveLocal();
+        syncCloud();
+      }
+
+      // ==========================================
+      // NOTIFICATIONS
+      // ==========================================
+      function isNotifOn() {
+        return localStorage.getItem('dtp_notif') === 'on';
+      }
+
+      function updateNotifUI() {
+        var b = document.getElementById('notif-toggle');
+        if (!b) return;
+        if (isNotifOn()) {
+          b.classList.add('active');
+          b.innerHTML = '&#128276; On';
+        } else {
+          b.classList.remove('active');
+          b.innerHTML = '&#128277; Off';
+        }
+      }
+
+      window.toggleNotifications = function () {
+        if (isNotifOn()) {
+          localStorage.setItem('dtp_notif', 'off');
+          updateNotifUI();
+          toast('Notifications muted.', '');
+          return;
+        }
+        if (!('Notification' in window)) {
+          toast('Not supported in this browser.', 'error');
+          return;
+        }
+        if (Notification.permission === 'granted') {
+          localStorage.setItem('dtp_notif', 'on');
+          updateNotifUI();
+          toast('Notifications on!', 'success');
+          startNotifs();
+        } else if (Notification.permission === 'denied') {
+          toast('Blocked. Enable in browser settings.', 'error');
+        } else {
+          Notification.requestPermission().then(function (p) {
+            if (p === 'granted') {
+              localStorage.setItem('dtp_notif', 'on');
+              updateNotifUI();
+              toast('Notifications on!', 'success');
+              startNotifs();
+            } else {
+              toast('Denied.', 'error');
+            }
+          });
+        }
+      };
+
+      function sendNotif(t, b) {
+        if (!isNotifOn() || !('Notification' in window) || Notification.permission !== 'granted') return;
+        try {
+          new Notification(t, { body: b, icon: './icon-192.png' });
+        } catch (e) {
+          if (navigator.serviceWorker && navigator.serviceWorker.ready) {
+            navigator.serviceWorker.ready.then(function (r) {
+              r.showNotification(t, { body: b, icon: './icon-192.png' });
+            });
+          }
+        }
+      }
+
+      function checkReminders() {
+        if (!userData || !isNotifOn() || !activeEmail) return;
+        var today = fmtKey(new Date());
+        var s = userData.trackerData[today];
+        var lrKey = 'dtp_lr_' + activeEmail;
+        var lyKey = 'dtp_ly_' + activeEmail;
+
+        if (!s || s === 'none') {
+          var lr = localStorage.getItem(lrKey);
+          var now = Date.now();
+          if (!lr || now - parseInt(lr) > 7200000) {
+            sendNotif('Days Tracking Pro', 'Don\'t forget to mark today!');
+            localStorage.setItem(lrKey, String(now));
+          }
+        }
+
+        var yd = new Date();
+        yd.setDate(yd.getDate() - 1);
+        var ydk = fmtKey(yd);
+        var yds = userData.trackerData[ydk];
+        if (yds === 'none') {
+          var ly = localStorage.getItem(lyKey);
+          var n2 = Date.now();
+          if (!ly || n2 - parseInt(ly) > 86400000) {
+            sendNotif('Missed Yesterday!', 'You forgot to mark yesterday.');
+            localStorage.setItem(lyKey, String(n2));
+          }
+        }
+      }
+
+      function checkStreakNotif() {
+        if (!userData || !isNotifOn() || !activeEmail) return;
+        var start = getStartDate();
+        var days = userData.daysCount || 30;
+        var cur = 0;
+        for (var j = days - 1; j >= 0; j--) {
+          var d = new Date(start);
+          d.setDate(start.getDate() + j);
+          if (userData.trackerData[fmtKey(d)] === 'checked') cur++;
+          else if (cur > 0) break;
+        }
+        if (cur > 0 && cur % 5 === 0) {
+          var snKey = 'dtp_sn_' + activeEmail;
+          var ls = localStorage.getItem(snKey);
+          if (ls !== String(cur)) {
+            sendNotif('Streak: ' + cur + ' days!', 'Keep the momentum going!');
+            localStorage.setItem(snKey, String(cur));
+          }
+        }
+      }
+
+      function startNotifs() {
+        if (notifInterval) clearInterval(notifInterval);
+        setTimeout(function () {
+          checkReminders();
+          checkStreakNotif();
+        }, 3000);
+        notifInterval = setInterval(checkReminders, 1800000);
+      }
+
+      // ==========================================
+      // DEFAULTS & ENSURE
+      // ==========================================
+      function makeDef(n, e) {
+        return {
+          profileName: n,
+          profileEmail: e,
+          habitName: 'My Target Habit',
+          customStart: null,
+          daysCount: 30,
+          fadeDuration: DEFAULT_FADE,
+          trackerData: {},
+          timestamps: {},
+          locked: {},
+          history: [],
+          lastActive: Date.now()
+        };
+      }
+
+      function ensure(u) {
+        if (!u.trackerData) u.trackerData = {};
+        if (!u.timestamps) u.timestamps = {};
+        if (!u.locked) u.locked = {};
+        if (!u.history) u.history = [];
+        if (!u.habitName) u.habitName = 'My Target Habit';
+        if (u.fadeDuration === undefined || u.fadeDuration === null) u.fadeDuration = DEFAULT_FADE;
+        if (u.customStart === undefined) u.customStart = null;
+        if (u.daysCount === undefined) u.daysCount = 30;
+        return u;
+      }
+
+      // ==========================================
+      // THEME
+      // ==========================================
+      var THEMES = ['dark', 'light', 'grey'];
+      var THEME_LABEL = { dark: '\u263E Dark', light: '\u2600 Light', grey: '\u25D1 Grey' };
+
+      function applyTheme(t) {
+        if (t === 'dark') document.body.removeAttribute('data-theme');
+        else document.body.setAttribute('data-theme', t);
+      }
+
+      function initTheme() {
+        var s = localStorage.getItem('theme') || 'dark';
+        if (THEMES.indexOf(s) === -1) s = 'dark';
+        applyTheme(s);
+        updateThemeUI();
+      }
+
+      window.toggleTheme = function () {
+        var cur = document.body.getAttribute('data-theme') || 'dark';
+        var next = THEMES[(THEMES.indexOf(cur) + 1) % THEMES.length];
+        applyTheme(next);
+        localStorage.setItem('theme', next);
+        updateThemeUI();
+      };
+
+      function updateThemeUI() {
+        var cur = document.body.getAttribute('data-theme') || 'dark';
+        var l = THEME_LABEL[cur];
+        var e1 = document.getElementById('theme-toggle');
+        var e2 = document.getElementById('login-theme-toggle');
+        if (e1) e1.innerText = l;
+        if (e2) e2.innerText = l;
+      }
+
+      // ==========================================
+      // TOAST
+      // ==========================================
+      function toast(m, t) {
+        var e = document.getElementById('toast');
+        e.textContent = m;
+        e.className = 'toast show' + (t ? ' toast-' + t : '');
+        setTimeout(function () { e.className = 'toast'; }, 3000);
+      }
+
+      // ==========================================
+      // SCREENS
+      // ==========================================
+      function showLogin() {
+        document.getElementById('app-screen').classList.remove('active-screen');
+        document.getElementById('app-screen').style.display = 'none';
+        document.getElementById('login-screen').classList.add('active-screen');
+      }
+
+      function showApp() {
+        document.getElementById('login-screen').classList.remove('active-screen');
+        document.getElementById('app-screen').classList.add('active-screen');
+        document.getElementById('app-screen').style.display = 'flex';
+        if (!userData) { showLogin(); return; }
+        ensure(userData);
+        userData.lastActive = Date.now();
+        document.getElementById('greeting-name').innerText = 'Hi, ' + userData.profileName;
+        document.getElementById('greeting-email').innerText = userData.profileEmail;
+        document.getElementById('habit-name-input').value = userData.habitName;
+        updateTimerDisplay();
+        updateNotifUI();
+        initTracker();
+        renderHistory();
+        startInterval();
+        if (isNotifOn()) startNotifs();
+      }
+
+      // ==========================================
+      // LOGIN / LOGOUT
+      // ==========================================
+      window.login = function (fn, fe) {
+        var name = fn || document.getElementById('username-input').value.trim();
+        var email = fe || document.getElementById('useremail-input').value.trim();
+        var st = document.getElementById('login-status');
+        st.className = 'status-msg';
+
+        if (!name || !email) {
+          st.className = 'status-msg status-error';
+          st.innerText = 'Both fields required.';
+          return;
+        }
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+          st.className = 'status-msg status-error';
+          st.innerText = 'Invalid email.';
+          return;
+        }
+
+        activeEmail = email;
+        lastCloudUpdatedAt = null;
+        loadCloud(email, function (cloud) {
+          var local = loadLocal(email);
+          var localEditTs = parseInt(localStorage.getItem('dtp_lastedit_' + email) || '0', 10);
+          var cloudTs = lastCloudUpdatedAt ? new Date(lastCloudUpdatedAt).getTime() : 0;
+
+          if (cloud && local && localEditTs > cloudTs) {
+            // This device has offline edits newer than what's in the cloud - keep them, they'll push up.
+            userData = local;
+          } else if (cloud) {
+            userData = cloud;
+          } else if (local) {
+            userData = local;
+          } else {
+            userData = makeDef(name, email);
+          }
+          userData.profileName = name;
+          ensure(userData);
+          saveAll();
+          showApp();
+          if (!isGuest(email)) startPullPolling(); else setSS('guest');
+          toast('Welcome, ' + name + '!', 'success');
+        });
+      };
+
+      window.logout = function () {
+        stopInterval();
+        stopPullPolling();
+        if (notifInterval) clearInterval(notifInterval);
+        saveAll();
+        activeEmail = null;
+        userData = null;
+        lastCloudUpdatedAt = null;
+        localStorage.removeItem('dtp_active');
+        showLogin();
+      };
+
+      // ==========================================
+      // TRACKER
+      // ==========================================
+      function getStartDate() {
+        if (!userData) return new Date();
+        if (userData.customStart) return new Date(userData.customStart);
+        var n = new Date();
+        return new Date(n.getFullYear(), n.getMonth(), 1);
+      }
+
+      function initTracker() {
+        if (!userData) return;
+        var start = getStartDate();
+        var days = userData.daysCount || 30;
+
+        for (var i = 0; i < days; i++) {
+          var d = new Date(start);
+          d.setDate(start.getDate() + i);
+          var dk = fmtKey(d);
+          if (!userData.trackerData[dk]) userData.trackerData[dk] = 'none';
+          if (!userData.timestamps[dk]) userData.timestamps[dk] = Date.now();
+        }
+
+        document.getElementById('month-year-display').innerText =
+          MO[start.getMonth()] + ' ' + start.getDate() + ', ' + start.getFullYear() + ' \u2022 ' + days + 'd';
+        document.getElementById('adj-day').value = start.getDate();
+        document.getElementById('adj-month').value = start.getMonth();
+        document.getElementById('adj-year').value = start.getFullYear();
+        document.getElementById('adj-days-count').value = days;
+
+        renderGrid(start, days);
+        updateStats();
+        updateStreak();
+      }
+
+      function renderGrid(start, days) {
+        var g = document.getElementById('days-grid');
+        g.innerHTML = '';
+        if (!userData) return;
+        var lockedAny = false;
+
+        for (var i = 0; i < days; i++) {
+          var d = new Date(start);
+          d.setDate(start.getDate() + i);
+          var dk = fmtKey(d);
+          if (userData.locked[dk]) continue;
+          var state = userData.trackerData[dk] || 'none';
+
+          if (state !== 'none') {
+            var fsCheck = getFadeS(dk);
+            if (fsCheck === 'expired') {
+              userData.locked[dk] = true;
+              lockedAny = true;
+              continue;
+            }
+          }
+
+          var box = document.createElement('div');
+          box.className = 'day-box';
+          box.setAttribute('data-key', dk);
+          box.style.animationDelay = (i * 0.025) + 's';
+
+          if (state === 'checked') box.classList.add('state-checked');
+          else if (state === 'crossed') box.classList.add('state-crossed');
+
+          var badge = '';
+          if (state !== 'none') {
+            var fs = getFadeS(dk);
+            if (fs !== 'none') {
+              badge = '<span class="timer-badge' + (fs.urgent ? ' urgent' : '') + '">' + fs.text + '</span>';
+            }
+          }
+
+          box.innerHTML = badge +
+            '<span class="day-name">' + DS[d.getDay()] + '</span>' +
+            '<span class="date-num">' + d.getDate() + '</span>' +
+            '<div class="action-space">' +
+              '<button class="action-btn btn-check" onclick="markDay(\'' + dk + '\',\'checked\')">\u2713</button>' +
+              '<button class="action-btn btn-cross" onclick="markDay(\'' + dk + '\',\'crossed\')">\u2717</button>' +
+            '</div>';
+
+          g.appendChild(box);
+        }
+
+        if (lockedAny) saveAll();
+      }
+
+      // ==========================================
+      // MARK DAY
+      // ==========================================
+      window.markDay = function (dk, ns) {
+        if (!userData) return;
+        if (userData.locked[dk]) { toast('This day has expired and is locked.', 'error'); return; }
+        var cur = userData.trackerData[dk] || 'none';
+        userData.trackerData[dk] = (cur === ns) ? 'none' : ns;
+        userData.timestamps[dk] = Date.now();
+        saveAll();
+
+        var box = document.querySelector('[data-key="' + dk + '"]');
+        if (box) {
+          box.classList.remove('state-checked', 'state-crossed', 'fading-out');
+          box.style.animation = 'none';
+          box.offsetHeight;
+          var s = userData.trackerData[dk];
+          if (s === 'checked') box.classList.add('state-checked');
+          else if (s === 'crossed') box.classList.add('state-crossed');
+          box.style.animation = '';
+
+          var b = box.querySelector('.timer-badge');
+          if (b) b.remove();
+
+          if (s !== 'none') {
+            var fs2 = getFadeS(dk);
+            if (fs2 === 'expired') {
+              box.classList.add('fading-out');
+              var eb = document.createElement('span');
+              eb.className = 'timer-badge expired';
+              eb.textContent = 'EXPIRED';
+              box.prepend(eb);
+            } else if (fs2 !== 'none') {
+              var nb = document.createElement('span');
+              nb.className = 'timer-badge' + (fs2.urgent ? ' urgent' : '');
+              nb.textContent = fs2.text;
+              box.prepend(nb);
+            }
+          }
+        }
+
+        updateStats();
+        updateStreak();
+        checkStreakNotif();
+      };
+
+      // ==========================================
+      // TIMER / FADE LOGIC
+      // ==========================================
+      function getFD() {
+        if (!userData) return DEFAULT_FADE;
+        var f = userData.fadeDuration;
+        return f === 'never' ? 'never' : (f || DEFAULT_FADE);
+      }
+
+      function getFadeS(dk) {
+        var fd = getFD();
+        if (fd === 'never') return 'none';
+        if (!userData) return 'none';
+        var ts = userData.timestamps[dk];
+        if (!ts) return 'none';
+
+        var rem = fd - (Date.now() - ts);
+        if (rem <= 0) return 'expired';
+
+        var text;
+        if (rem < 60000) text = Math.ceil(rem / 1000) + 's';
+        else if (rem < 3600000) text = Math.ceil(rem / 60000) + 'm';
+        else {
+          var h = Math.floor(rem / 3600000);
+          var m = Math.floor((rem % 3600000) / 60000);
+          text = (h < 5 && m > 0) ? h + 'h ' + m + 'm' : h + 'h';
+        }
+        return { text: text, urgent: rem < fd * 0.1 };
+      }
+
+      function startInterval() {
+        stopInterval();
+        cInterval = setInterval(tickT, 1000);
+      }
+
+      function stopInterval() {
+        if (cInterval) { clearInterval(cInterval); cInterval = null; }
+      }
+
+      function tickT() {
+        if (!userData || getFD() === 'never') return;
+        var boxes = document.querySelectorAll('.day-box');
+        var lockedAny = false;
+
+        for (var i = 0; i < boxes.length; i++) {
+          var box = boxes[i];
+          var dk = box.getAttribute('data-key');
+          var state = userData.trackerData[dk] || 'none';
+          if (state === 'none' || userData.locked[dk]) continue;
+
+          var fs = getFadeS(dk);
+          var badge = box.querySelector('.timer-badge');
+
+          if (fs === 'none') {
+            if (badge) badge.remove();
+            box.classList.remove('fading-out');
+            continue;
+          }
+
+          if (fs === 'expired') {
+            userData.locked[dk] = true;
+            lockedAny = true;
+            box.remove();
+          } else {
+            box.classList.remove('fading-out');
+            var c = 'timer-badge' + (fs.urgent ? ' urgent' : '');
+            if (badge) {
+              badge.className = c;
+              badge.textContent = fs.text;
+            } else {
+              var n2 = document.createElement('span');
+              n2.className = c;
+              n2.textContent = fs.text;
+              box.prepend(n2);
+            }
+          }
+        }
+
+        if (lockedAny) {
+          saveAll();
+          updateStats();
+          updateStreak();
+        }
+      }
+      window.setTimerPreset = function (btn) {
+        if (!userData) return;
+        var ms = btn.getAttribute('data-ms');
+        document.querySelectorAll('.timer-preset-btn').forEach(function (b) { b.classList.remove('active'); });
+        btn.classList.add('active');
+
+        if (ms === 'never') {
+          userData.fadeDuration = 'never';
+          saveAll();
+          updateTimerDisplay();
+          document.querySelectorAll('.day-box').forEach(function (b) {
+            b.classList.remove('fading-out');
+            var x = b.querySelector('.timer-badge');
+            if (x) x.remove();
+          });
+          toast('Timer off.', '');
+        } else {
+          userData.fadeDuration = parseInt(ms);
+          saveAll();
+          updateTimerDisplay();
+          resetUnmarked();
+          initTracker();
+          toast('Timer set!', 'success');
+        }
+      };
+
+      window.applyCustomTimer = function () {
+        var input = document.getElementById('custom-timer-input').value.trim();
+        if (!input) return;
+        var ms = parseT(input);
+        if (!ms || ms <= 0) { toast('Invalid format.', 'error'); return; }
+        if (!userData) return;
+
+        userData.fadeDuration = ms;
+        saveAll();
+        updateTimerDisplay();
+        document.querySelectorAll('.timer-preset-btn').forEach(function (b) { b.classList.remove('active'); });
+        resetUnmarked();
+        initTracker();
+        document.getElementById('custom-timer-input').value = '';
+        toast('Timer set!', 'success');
+      };
+
+      function parseT(s) {
+        s = s.toLowerCase().trim();
+        var t = 0, m = false;
+        var hm = s.match(/(\d+(?:\.\d+)?)\s*h/);
+        if (hm) { t += parseFloat(hm[1]) * 3600000; m = true; }
+        var mm = s.match(/(\d+(?:\.\d+)?)\s*m(?!s)/);
+        if (mm) { t += parseFloat(mm[1]) * 60000; m = true; }
+        var sm = s.match(/(\d+(?:\.\d+)?)\s*s/);
+        if (sm) { t += parseFloat(sm[1]) * 1000; m = true; }
+        if (!m) { var n = parseFloat(s); if (!isNaN(n)) { t = n * 60000; m = true; } }
+        return m ? t : null;
+      }
+
+      function resetUnmarked() {
+        if (!userData) return;
+        var start = getStartDate();
+        var days = userData.daysCount || 30;
+        for (var i = 0; i < days; i++) {
+          var d = new Date(start);
+          d.setDate(start.getDate() + i);
+          var dk = fmtKey(d);
+          if (userData.trackerData[dk] && userData.trackerData[dk] !== 'none') {
+            userData.timestamps[dk] = Date.now();
+          }
+        }
+        saveAll();
+      }
+
+      function updateTimerDisplay() {
+        var dur = getFD();
+        var el = document.getElementById('current-timer-label');
+
+        if (dur === 'never') el.innerText = 'Never';
+        else if (dur < 60000) el.innerText = Math.round(dur / 1000) + 's';
+        else if (dur < 3600000) el.innerText = Math.round(dur / 60000) + 'm';
+        else if (dur < 86400000) {
+          var h = dur / 3600000;
+          el.innerText = (h % 1 === 0 ? h : h.toFixed(1)) + 'h';
+        } else {
+          var dd = dur / 86400000;
+          el.innerText = (dd % 1 === 0 ? dd : dd.toFixed(1)) + 'd';
+        }
+
+        document.querySelectorAll('.timer-preset-btn').forEach(function (btn) {
+          var ms = btn.getAttribute('data-ms');
+          if (dur === 'never' && ms === 'never') btn.classList.add('active');
+          else if (parseInt(ms) === dur) btn.classList.add('active');
+          else btn.classList.remove('active');
+        });
+      }
+
+      // ==========================================
+      // DATE ADJUSTMENT
+      // ==========================================
+      window.toggleDateAdjust = function () {
+        document.getElementById('date-adjust-panel').classList.toggle('open');
+        document.getElementById('timer-adjust-panel').classList.remove('open');
+      };
+
+      window.toggleTimerAdjust = function () {
+        document.getElementById('timer-adjust-panel').classList.toggle('open');
+        document.getElementById('date-adjust-panel').classList.remove('open');
+      };
+
+      window.applyDateAdjust = function () {
+        if (!userData) return;
+        var day = parseInt(document.getElementById('adj-day').value) || 1;
+        var month = parseInt(document.getElementById('adj-month').value);
+        var year = parseInt(document.getElementById('adj-year').value) || 2026;
+        var cnt = Math.max(1, Math.min(366, parseInt(document.getElementById('adj-days-count').value) || 30));
+        day = Math.min(day, new Date(year, month + 1, 0).getDate());
+
+        userData.customStart = new Date(year, month, day).toISOString();
+        userData.daysCount = cnt;
+        userData.trackerData = {};
+        userData.timestamps = {};
+        saveAll();
+        initTracker();
+        document.getElementById('date-adjust-panel').classList.remove('open');
+        toast('Updated!', 'success');
+      };
+
+      window.resetToDefault = function () {
+        if (!userData) return;
+        userData.customStart = null;
+        userData.daysCount = 30;
+        userData.trackerData = {};
+        userData.timestamps = {};
+        saveAll();
+        initTracker();
+        document.getElementById('date-adjust-panel').classList.remove('open');
+      };
+
+      // ==========================================
+      // STATS
+      // ==========================================
+      function updateStats() {
+        if (!userData) return;
+        var ck = 0, cr = 0, t = 0;
+        Object.keys(userData.trackerData).forEach(function (k) {
+          t++;
+          if (userData.trackerData[k] === 'checked') ck++;
+          else if (userData.trackerData[k] === 'crossed') cr++;
+        });
+
+        var p = t - ck - cr;
+        var r = t > 0 ? Math.round((ck / t) * 100) : 0;
+
+        document.getElementById('stat-checked').textContent = ck;
+        document.getElementById('stat-crossed').textContent = cr;
+        document.getElementById('stat-pending').textContent = p;
+        document.getElementById('stat-rate').textContent = r + '%';
+
+        var pf = document.getElementById('progress-fill');
+        pf.style.width = Math.min(100, Math.round(((ck + cr) / (userData.daysCount || 30)) * 100)) + '%';
+        pf.style.background = r >= 70 ? 'var(--green)' : r >= 40 ? 'var(--amber)' : 'var(--red)';
+      }
+
+      function updateStreak() {
+        if (!userData) return;
+        var badge = document.getElementById('streak-badge');
+        var start = getStartDate();
+        var days = userData.daysCount || 30;
+        var mx = 0, tmp = 0, cur = 0;
+
+        for (var i = 0; i < days; i++) {
+          var d = new Date(start);
+          d.setDate(start.getDate() + i);
+          if (userData.trackerData[fmtKey(d)] === 'checked') {
+            tmp++;
+            if (tmp > mx) mx = tmp;
+          } else {
+            tmp = 0;
+          }
+        }
+
+        for (var j = days - 1; j >= 0; j--) {
+          var d2 = new Date(start);
+          d2.setDate(start.getDate() + j);
+          if (userData.trackerData[fmtKey(d2)] === 'checked') cur++;
+          else if (cur > 0) break;
+        }
+
+        if (cur > 0 || mx > 0) {
+          badge.style.display = 'inline-flex';
+          badge.innerHTML = '&#128293; ' + cur + (mx > cur ? ' (best: ' + mx + ')' : '');
+        } else {
+          badge.style.display = 'none';
+        }
+
+        document.querySelectorAll('.day-box.in-streak').forEach(function (b) { b.classList.remove('in-streak'); });
+        if (cur > 0) {
+          for (var k = days - 1; k >= 0; k--) {
+            var dk3 = new Date(start);
+            dk3.setDate(start.getDate() + k);
+            var key3 = fmtKey(dk3);
+            if (userData.trackerData[key3] !== 'checked') break;
+            var box3 = document.querySelector('.day-box[data-key="' + key3 + '"]');
+            if (box3) box3.classList.add('in-streak');
+          }
+        }
+      }
+
+      // ==========================================
+      // HISTORY
+      // ==========================================
+      function renderHistory() {
+        if (!userData) return;
+        var log = document.getElementById('history-log');
+
+        if (!userData.history || !userData.history.length) {
+          log.innerHTML = '<div class="empty-state">No records yet.</div>';
+          return;
+        }
+
+        log.innerHTML = '';
+        for (var i = 0; i < userData.history.length; i++) {
+          var r = userData.history[i];
+          var rate = r.total > 0 ? Math.round((r.checked / r.total) * 100) : 0;
+          var item = document.createElement('div');
+          item.className = 'history-item';
+          item.innerHTML =
+            '<div class="history-info">' +
+              '<strong>' + esc(r.habitName || 'Untitled') + '</strong>' +
+              '<div class="history-stats">' +
+                '<span class="stat-green">\u2713 ' + r.checked + '</span>' +
+                '<span class="stat-red">\u2717 ' + r.crossed + '</span>' +
+                '<span style="color:var(--text-dim)">' + rate + '%</span>' +
+                '<span style="color:var(--text-dim)">' + (r.period || '') + '</span>' +
+              '</div>' +
+            '</div>' +
+            '<div class="history-actions">' +
+              '<button class="btn btn-ghost btn-xs" onclick="viewRecord(' + i + ')">View</button>' +
+              '<button class="btn btn-danger-soft btn-xs" onclick="openDeleteModal(' + i + ')">Del</button>' +
+            '</div>';
+          log.appendChild(item);
+        }
+      }
+
+      window.viewRecord = function (i) {
+        if (!userData || !userData.history[i]) return;
+        var r = userData.history[i];
+        var g = document.getElementById('view-days-grid');
+        document.getElementById('view-modal-title').textContent = r.habitName || 'Record';
+        g.innerHTML = '';
+
+        if (r.days) {
+          r.days.forEach(function (day) {
+            var box = document.createElement('div');
+            box.className = 'day-box readonly-day';
+            if (day.state === 'checked') box.classList.add('state-checked');
+            else if (day.state === 'crossed') box.classList.add('state-crossed');
+            box.innerHTML = '<span class="day-name">' + (day.dayName || '') + '</span><span class="date-num">' + (day.date || '') + '</span>';
+            g.appendChild(box);
+          });
+        }
+
+        document.getElementById('view-modal').classList.add('active');
+      };
+
+      window.openDeleteModal = function (i) {
+        delIdx = i;
+        document.getElementById('delete-modal').classList.add('active');
+      };
+
+      window.confirmDeleteRecord = function () {
+        if (delIdx === null || !userData) return;
+        userData.history.splice(delIdx, 1);
+        delIdx = null;
+        saveAll();
+        renderHistory();
+        closeModals();
+        toast('Deleted.', '');
+      };
+
+      // ==========================================
+      // END MONTH
+      // ==========================================
+      window.openConfirmModal = function () {
+        document.getElementById('confirm-modal').classList.add('active');
+      };
+
+      window.confirmEndMonth = function () {
+        if (!userData) return;
+        var start = getStartDate();
+        var days = userData.daysCount || 30;
+        var ck = 0, cr = 0, dl = [];
+
+        for (var i = 0; i < days; i++) {
+          var d = new Date(start);
+          d.setDate(start.getDate() + i);
+          var dk = fmtKey(d);
+          var s = userData.trackerData[dk] || 'none';
+          if (s === 'checked') ck++;
+          else if (s === 'crossed') cr++;
+          dl.push({ date: d.getDate(), dayName: DS[d.getDay()], state: s });
+        }
+
+        var end = new Date(start);
+        end.setDate(start.getDate() + days - 1);
+        var period = MO[start.getMonth()].substr(0, 3) + ' ' + start.getDate() + ' - ' +
+          MO[end.getMonth()].substr(0, 3) + ' ' + end.getDate() + ', ' + end.getFullYear();
+
+        userData.history.unshift({
+          habitName: userData.habitName,
+          period: period,
+          checked: ck,
+          crossed: cr,
+          total: days,
+          days: dl,
+          savedAt: Date.now()
+        });
+
+        userData.trackerData = {};
+        userData.timestamps = {};
+        var ns = new Date(end);
+        ns.setDate(ns.getDate() + 1);
+        userData.customStart = ns.toISOString();
+
+        saveAll();
+        closeModals();
+        initTracker();
+        renderHistory();
+        toast('Cycle saved!', 'success');
+      };
+
+      // ==========================================
+      // COMPLAINT / REPORT
+      // ==========================================
+      window.openComplaintModal = function () {
+        document.getElementById('complaint-modal').classList.add('active');
+        document.getElementById('complaint-status').className = 'status-msg';
+        document.getElementById('complaint-text').value = '';
+        document.getElementById('complaint-actions').style.display = 'flex';
+        document.getElementById('complaint-close-wrap').style.display = 'none';
+      };
+
+      window.submitComplaint = function () {
+        var text = document.getElementById('complaint-text').value.trim();
+        var st = document.getElementById('complaint-status');
+
+        if (!text) {
+          st.className = 'status-msg status-error';
+          st.innerText = 'Describe the issue first.';
+          return;
+        }
+
+        st.className = 'status-msg';
+        var fd = new FormData();
+        fd.append('message', text);
+        fd.append('email', activeEmail || 'unknown');
+        fd.append('name', userData ? userData.profileName : 'unknown');
+        fd.append('_subject', 'Days Tracking Pro: Report');
+
+        fetch('https://formspree.io/f/xbdeqknr', {
+          method: 'POST',
+          body: fd,
+          headers: { 'Accept': 'application/json' }
+        }).then(function (r) {
+          if (r.ok) {
+            st.className = 'status-msg status-success';
+            st.innerText = 'Sent! We\'ll look into it.';
+            document.getElementById('complaint-actions').style.display = 'none';
+            document.getElementById('complaint-close-wrap').style.display = 'block';
+          } else {
+            st.className = 'status-msg status-error';
+            st.innerText = 'Failed to send.';
+          }
+        }).catch(function () {
+          st.className = 'status-msg status-error';
+          st.innerText = 'Network error.';
+        });
+      };
+
+      // ==========================================
+      // MODALS
+      // ==========================================
+      window.closeModals = function () {
+        document.querySelectorAll('.modal-overlay').forEach(function (m) {
+          m.classList.remove('active');
+        });
+        delIdx = null;
+      };
+
+      // ==========================================
+      // HABIT NAME
+      // ==========================================
+      window.saveHabitName = function () {
+        if (!userData) return;
+        userData.habitName = document.getElementById('habit-name-input').value.trim() || 'My Habit';
+        saveAll();
+      };
+
+      // ==========================================
+      // UTILITIES
+      // ==========================================
+      function fmtKey(d) {
+        return d.getFullYear() + '-' +
+          String(d.getMonth() + 1).padStart(2, '0') + '-' +
+          String(d.getDate()).padStart(2, '0');
+      }
+
+      function esc(s) {
+        var d = document.createElement('div');
+        d.textContent = s;
+        return d.innerHTML;
+      }
+
+      // ==========================================
+      // EVENT LISTENERS
+      // ==========================================
+      document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape') closeModals();
+      });
+
+      document.addEventListener('click', function (e) {
+        if (e.target.classList.contains('modal-overlay')) closeModals();
+      });
+
+      var nt = null;
+      document.getElementById('habit-name-input').addEventListener('input', function () {
+        if (nt) clearTimeout(nt);
+        nt = setTimeout(saveHabitName, 500);
+      });
+
+      document.getElementById('useremail-input').addEventListener('keydown', function (e) {
+        if (e.key === 'Enter') login();
+      });
+
+      document.getElementById('username-input').addEventListener('keydown', function (e) {
+        if (e.key === 'Enter') document.getElementById('useremail-input').focus();
+      });
+
+      window.addEventListener('beforeunload', function () {
+        saveLocal();
+      });
+
+      // ==========================================
+      // SERVICE WORKER
+      // ==========================================
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('./sw.js').catch(function () { });
+      }
+
+      // ==========================================
+      // INITIALIZATION
+      // ==========================================
+      initTheme();
+      var saved = localStorage.getItem('dtp_active');
+
+      if (saved) {
+        activeEmail = saved;
+        var local = loadLocal(saved);
+        if (local) {
+          userData = local;
+          ensure(userData);
+          showApp();
+          if (!isGuest(saved)) {
+            startPullPolling();
+            lastCloudUpdatedAt = null;
+            loadCloud(saved, function (cloud) {
+              if (!cloud) return;
+              var localEditTs = parseInt(localStorage.getItem('dtp_lastedit_' + saved) || '0', 10);
+              var cloudTs = lastCloudUpdatedAt ? new Date(lastCloudUpdatedAt).getTime() : 0;
+              if (cloudTs > localEditTs) {
+                var keepName = userData.profileName;
+                userData = cloud;
+                userData.profileName = keepName;
+                ensure(userData);
+                saveLocal();
+                showApp();
+                toast('Synced latest changes from the cloud.', '');
+              }
+            });
+          } else {
+            setSS('guest');
+          }
+        } else {
+          showLogin();
+        }
+      } else {
+        showLogin();
+      }
+
+    })();
+  </script>
+</body>
+</html>
