@@ -39,8 +39,6 @@
 </style>
 <script>
 (function () {
-    // Chrome UI (hover devices only): credit badge with idle-fade.
-    // Deferred until body exists since the script may run in <head>.
     function initChromeUI() {
         if (!matchMedia('(hover: hover)').matches) return;
 
@@ -81,8 +79,7 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
+  
   <style>
     /* ============================================
        RESET & BASE
@@ -1003,8 +1000,6 @@
       border-color: var(--red);
     }
 
-    /* Momentum glow — the tail of consecutive checked days lights up
-       with the accent, so an active streak reads as one glowing chain. */
     .day-box.in-streak {
       border-color: var(--accent-border);
       box-shadow: var(--shadow-glass), 0 0 0 1px var(--accent-border), 0 0 22px -6px var(--accent);
@@ -1405,7 +1400,7 @@
     <div class="login-brand">
       <div class="login-logo">&#9670;</div>
       <div>
-        <div class="login-brand-name">Days Tracking Pro</div>
+        <div class="login-brand-name">Days Tracker Pro</div>
         <div class="login-brand-sub">Cloud Sync &middot; Notifications</div>
       </div>
       <button class="theme-pill" style="margin-left:auto" id="login-theme-toggle" onclick="toggleTheme()">&#9728; Light</button>
@@ -1426,9 +1421,14 @@
       <input type="email" id="useremail-input" class="login-input" placeholder="you@example.com">
     </div>
 
-    <button class="btn btn-primary btn-full" onclick="login()">Access Dashboard</button>
+    <div class="field-wrap">
+      <label class="field-label">Password</label>
+      <input type="password" id="userpassword-input" class="login-input" placeholder="Min 6 characters">
+    </div>
+
+    <button class="btn btn-primary btn-full" onclick="window.login()">Access Dashboard</button>
     <div class="divider-text">OR</div>
-    <button class="btn btn-ghost btn-full" onclick="login('Guest','guest@local.app')">Continue as Guest (no sync)</button>
+    <button class="btn btn-ghost btn-full" onclick="window.login('Guest','guest@local.app')">Continue as Guest (no sync)</button>
   </div>
 
   <!-- ============================================
@@ -1629,133 +1629,133 @@
   <!-- ============================================
        JAVASCRIPT
        ============================================ -->
-  <script>
-    (function () {
-      'use strict';
+  <script type="module">
+    // 1. FIREBASE CONFIGURATION
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+    import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-      // ==========================================
-      // CONFIGURATION
-      // ==========================================
-      var SUPABASE_URL = 'https://mffmqfmfmiqaamrvkxky.supabase.co';
-      var SUPABASE_KEY = 'sb_publishable_wHHLJsD06iUEDbs1fTnk4w_jd3030yf';
-      var sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-      var DEFAULT_FADE = 23 * 3600000;
-      var MO = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
-      var DS = ['SU', 'MO', 'TU', 'WE', 'TH', 'FR', 'SA'];
+    // IMPORTANT: REPLACE WITH YOUR EXACT FIREBASE KEYS
+    const firebaseConfig = {
+      apiKey: "YOUR_API_KEY",
+      authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
+      projectId: "YOUR_PROJECT_ID",
+      storageBucket: "YOUR_PROJECT_ID.appspot.com",
+      messagingSenderId: "YOUR_SENDER_ID",
+      appId: "YOUR_APP_ID"
+    };
 
-      // ==========================================
-      // STATE
-      // ==========================================
-      var userData = null;
-      var activeEmail = null;
-      var cInterval = null;
-      var delIdx = null;
-      var syncTimer = null;
-      var notifInterval = null;
-      var isOnline = navigator.onLine;
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
 
-      // ==========================================
-      // CLOUD SYNC
-      // ==========================================
-      var lastCloudUpdatedAt = null;
-      var pullTimer = null;
+    // ==========================================
+    // STATE & DEFAULTS
+    // ==========================================
+    var userData = null;
+    var activeEmail = null;
+    var activeUid = null;
+    var cInterval = null;
+    var delIdx = null;
+    var syncTimer = null;
+    var notifInterval = null;
+    var isOnline = navigator.onLine;
 
-      function setSS(s) {
-        var e = document.getElementById('sync-status');
-        if (!e) return;
-        if (s === 'synced') {
-          e.className = 'sync-indicator sync-ok';
-          e.innerHTML = '&#9679; Synced';
-        } else if (s === 'syncing') {
-          e.className = 'sync-indicator sync-ing';
-          e.innerHTML = '&#9679; Syncing...';
-        } else if (s === 'guest') {
-          e.className = 'sync-indicator sync-off';
-          e.innerHTML = '&#9679; Local only (guest)';
-        } else {
-          e.className = 'sync-indicator sync-off';
-          e.innerHTML = '&#9679; Offline';
-        }
+    var DEFAULT_FADE = 23 * 3600000;
+    var MO = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+    var DS = ['SU', 'MO', 'TU', 'WE', 'TH', 'FR', 'SA'];
+
+    var lastCloudUpdatedAt = null;
+    var pullTimer = null;
+
+    // ==========================================
+    // CLOUD SYNC LOGIC (UPDATED FOR FIREBASE)
+    // ==========================================
+    function setSS(s) {
+      var e = document.getElementById('sync-status');
+      if (!e) return;
+      if (s === 'synced') {
+        e.className = 'sync-indicator sync-ok';
+        e.innerHTML = '&#9679; Synced';
+      } else if (s === 'syncing') {
+        e.className = 'sync-indicator sync-ing';
+        e.innerHTML = '&#9679; Syncing...';
+      } else if (s === 'guest') {
+        e.className = 'sync-indicator sync-off';
+        e.innerHTML = '&#9679; Local only (guest)';
+      } else {
+        e.className = 'sync-indicator sync-off';
+        e.innerHTML = '&#9679; Offline';
       }
+    }
 
-      function isGuest(email) {
-        return !email || email === 'guest@local.app';
-      }
+    function isGuest(email) {
+      return !email || email === 'guest@local.app';
+    }
 
-      function pushCloud(retrying) {
-        if (isGuest(activeEmail) || !userData) return;
-        if (!isOnline) { setSS('offline'); return; }
-        var email = activeEmail;
-        setSS('syncing');
-        var uid = email.toLowerCase().replace(/[^a-z0-9]/g, '_');
-        var nowIso = new Date().toISOString();
-        sb.from('user_data').upsert({
-          user_id: uid,
-          email: email,
+    async function pushCloud(retrying) {
+      if (isGuest(activeEmail) || !userData || !activeUid) return;
+      if (!isOnline) { setSS('offline'); return; }
+      
+      setSS('syncing');
+      var nowIso = new Date().toISOString();
+      
+      try {
+        await setDoc(doc(db, "users", activeUid), {
+          email: activeEmail,
           data: userData,
           updated_at: nowIso
-        }, { onConflict: 'user_id' }).then(function (r) {
-          if (activeEmail !== email) return; // user switched accounts mid-flight
-          if (r.error) {
-            console.error('Cloud sync error:', r.error);
-            if (!retrying) { setTimeout(function () { pushCloud(true); }, 4000); }
-            else setSS('offline');
-            return;
-          }
-          lastCloudUpdatedAt = nowIso;
-          setSS('synced');
-        }).catch(function (err) {
-          console.error('Cloud sync failed:', err);
-          if (activeEmail !== email) return;
-          if (!retrying) { setTimeout(function () { pushCloud(true); }, 4000); }
-          else setSS('offline');
         });
+        lastCloudUpdatedAt = nowIso;
+        setSS('synced');
+      } catch (err) {
+        console.error('Cloud sync failed:', err);
+        if (!retrying) { setTimeout(function () { pushCloud(true); }, 4000); }
+        else setSS('offline');
       }
+    }
 
-      function syncCloud() {
-        if (isGuest(activeEmail) || !userData) { if (isGuest(activeEmail)) setSS('guest'); return; }
-        if (!isOnline) { setSS('offline'); return; }
-        if (syncTimer) clearTimeout(syncTimer);
-        syncTimer = setTimeout(function () { pushCloud(false); }, 1500);
-      }
+    function syncCloud() {
+      if (isGuest(activeEmail) || !userData) { if (isGuest(activeEmail)) setSS('guest'); return; }
+      if (!isOnline) { setSS('offline'); return; }
+      if (syncTimer) clearTimeout(syncTimer);
+      syncTimer = setTimeout(function () { pushCloud(false); }, 1500);
+    }
 
-      function loadCloud(email, cb) {
-        if (isGuest(email)) { setSS('guest'); cb(null); return; }
-        if (!isOnline) { setSS('offline'); cb(null); return; }
-        var uid = email.toLowerCase().replace(/[^a-z0-9]/g, '_');
-        setSS('syncing');
-        // maybeSingle() (not single()) so a brand-new account with no cloud
-        // row yet doesn't get treated as an error.
-        sb.from('user_data').select('data, updated_at').eq('user_id', uid).maybeSingle().then(function (r) {
-          if (r.error) {
-            console.error('Cloud load error:', r.error);
-            setSS('offline');
-            cb(null);
-            return;
-          }
+    async function loadCloud(uid, email, cb) {
+      if (isGuest(email)) { setSS('guest'); cb(null); return; }
+      if (!isOnline) { setSS('offline'); cb(null); return; }
+      
+      setSS('syncing');
+      try {
+        const docSnap = await getDoc(doc(db, "users", uid));
+        if (docSnap.exists()) {
           setSS('synced');
-          if (r.data && r.data.updated_at) lastCloudUpdatedAt = r.data.updated_at;
-          cb(r.data && r.data.data ? r.data.data : null);
-        }).catch(function (err) {
-          console.error('Cloud load failed:', err);
-          setSS('offline');
+          var d = docSnap.data();
+          if (d.updated_at) lastCloudUpdatedAt = d.updated_at;
+          cb(d.data ? d.data : null);
+        } else {
+          setSS('synced');
           cb(null);
-        });
+        }
+      } catch (err) {
+        console.error('Cloud load failed:', err);
+        setSS('offline');
+        cb(null);
       }
+    }
 
-      // Pull remote changes made from another device on the same account.
-      // Only adopts the remote copy if it's actually newer than what we have.
-      function pullCloud() {
-        if (isGuest(activeEmail) || !userData || !isOnline) return;
-        var email = activeEmail;
-        var uid = email.toLowerCase().replace(/[^a-z0-9]/g, '_');
-        sb.from('user_data').select('data, updated_at').eq('user_id', uid).maybeSingle().then(function (r) {
-          if (r.error || !r.data || activeEmail !== email) return;
-          if (lastCloudUpdatedAt && new Date(r.data.updated_at) <= new Date(lastCloudUpdatedAt)) return;
-          if (!r.data.data) return;
-          lastCloudUpdatedAt = r.data.updated_at;
+    async function pullCloud() {
+      if (isGuest(activeEmail) || !userData || !isOnline || !activeUid) return;
+      try {
+        const docSnap = await getDoc(doc(db, "users", activeUid));
+        if (docSnap.exists()) {
+          var d = docSnap.data();
+          if (lastCloudUpdatedAt && new Date(d.updated_at) <= new Date(lastCloudUpdatedAt)) return;
+          if (!d.data) return;
+          lastCloudUpdatedAt = d.updated_at;
           var name = userData.profileName;
-          userData = r.data.data;
+          userData = d.data;
           userData.profileName = name;
           ensure(userData);
           saveLocal();
@@ -1763,316 +1763,290 @@
           renderHistory();
           setSS('synced');
           toast('Synced changes from another device.', '');
-        }).catch(function (err) { console.error('Cloud pull failed:', err); });
-      }
-
-      function startPullPolling() {
-        stopPullPolling();
-        pullTimer = setInterval(pullCloud, 45000);
-      }
-
-      function stopPullPolling() {
-        if (pullTimer) { clearInterval(pullTimer); pullTimer = null; }
-      }
-
-      window.addEventListener('online', function () { isOnline = true; syncCloud(); pullCloud(); });
-      window.addEventListener('offline', function () { isOnline = false; setSS(isGuest(activeEmail) ? 'guest' : 'offline'); });
-      document.addEventListener('visibilitychange', function () {
-        if (!document.hidden) { isOnline = navigator.onLine; pullCloud(); }
-      });
-
-      // ==========================================
-      // LOCAL STORAGE
-      // ==========================================
-      function saveLocal() {
-        if (!activeEmail || !userData) return;
-        try {
-          localStorage.setItem('dtp_' + activeEmail, JSON.stringify(userData));
-          localStorage.setItem('dtp_active', activeEmail);
-          if (!isGuest(activeEmail)) {
-            localStorage.setItem('dtp_lastedit_' + activeEmail, String(Date.now()));
-          }
-        } catch (e) { }
-      }
-
-      function loadLocal(e) {
-        try {
-          var s = localStorage.getItem('dtp_' + e);
-          return s ? JSON.parse(s) : null;
-        } catch (x) {
-          return null;
         }
+      } catch (err) { 
+        console.error('Cloud pull failed:', err); 
       }
+    }
 
-      function saveAll() {
-        saveLocal();
-        syncCloud();
-      }
+    function startPullPolling() {
+      stopPullPolling();
+      pullTimer = setInterval(pullCloud, 45000);
+    }
 
-      // ==========================================
-      // NOTIFICATIONS
-      // ==========================================
-      function isNotifOn() {
-        return localStorage.getItem('dtp_notif') === 'on';
-      }
+    function stopPullPolling() {
+      if (pullTimer) { clearInterval(pullTimer); pullTimer = null; }
+    }
 
-      function updateNotifUI() {
-        var b = document.getElementById('notif-toggle');
-        if (!b) return;
-        if (isNotifOn()) {
-          b.classList.add('active');
-          b.innerHTML = '&#128276; On';
-        } else {
-          b.classList.remove('active');
-          b.innerHTML = '&#128277; Off';
+    window.addEventListener('online', function () { isOnline = true; syncCloud(); pullCloud(); });
+    window.addEventListener('offline', function () { isOnline = false; setSS(isGuest(activeEmail) ? 'guest' : 'offline'); });
+    document.addEventListener('visibilitychange', function () {
+      if (!document.hidden) { isOnline = navigator.onLine; pullCloud(); }
+    });
+
+    // ==========================================
+    // LOCAL STORAGE
+    // ==========================================
+    function saveLocal() {
+      if (!activeEmail || !userData) return;
+      try {
+        localStorage.setItem('dtp_' + activeEmail, JSON.stringify(userData));
+        localStorage.setItem('dtp_active', activeEmail);
+        if (!isGuest(activeEmail)) {
+          localStorage.setItem('dtp_lastedit_' + activeEmail, String(Date.now()));
         }
+      } catch (e) { }
+    }
+
+    function loadLocal(e) {
+      try {
+        var s = localStorage.getItem('dtp_' + e);
+        return s ? JSON.parse(s) : null;
+      } catch (x) {
+        return null;
       }
+    }
 
-      window.toggleNotifications = function () {
-        if (isNotifOn()) {
-          localStorage.setItem('dtp_notif', 'off');
-          updateNotifUI();
-          toast('Notifications muted.', '');
-          return;
-        }
-        if (!('Notification' in window)) {
-          toast('Not supported in this browser.', 'error');
-          return;
-        }
-        if (Notification.permission === 'granted') {
-          localStorage.setItem('dtp_notif', 'on');
-          updateNotifUI();
-          toast('Notifications on!', 'success');
-          startNotifs();
-        } else if (Notification.permission === 'denied') {
-          toast('Blocked. Enable in browser settings.', 'error');
-        } else {
-          Notification.requestPermission().then(function (p) {
-            if (p === 'granted') {
-              localStorage.setItem('dtp_notif', 'on');
-              updateNotifUI();
-              toast('Notifications on!', 'success');
-              startNotifs();
-            } else {
-              toast('Denied.', 'error');
-            }
-          });
-        }
-      };
+    function saveAll() {
+      saveLocal();
+      syncCloud();
+    }
 
-      function sendNotif(t, b) {
-        if (!isNotifOn() || !('Notification' in window) || Notification.permission !== 'granted') return;
-        try {
-          new Notification(t, { body: b, icon: './icon-192.png' });
-        } catch (e) {
-          if (navigator.serviceWorker && navigator.serviceWorker.ready) {
-            navigator.serviceWorker.ready.then(function (r) {
-              r.showNotification(t, { body: b, icon: './icon-192.png' });
-            });
-          }
-        }
-      }
+    // ==========================================
+    // NOTIFICATIONS
+    // ==========================================
+    function isNotifOn() { return localStorage.getItem('dtp_notif') === 'on'; }
 
-      function checkReminders() {
-        if (!userData || !isNotifOn() || !activeEmail) return;
-        var today = fmtKey(new Date());
-        var s = userData.trackerData[today];
-        var lrKey = 'dtp_lr_' + activeEmail;
-        var lyKey = 'dtp_ly_' + activeEmail;
+    function updateNotifUI() {
+      var b = document.getElementById('notif-toggle');
+      if (!b) return;
+      if (isNotifOn()) { b.classList.add('active'); b.innerHTML = '&#128276; On'; } 
+      else { b.classList.remove('active'); b.innerHTML = '&#128277; Off'; }
+    }
 
-        if (!s || s === 'none') {
-          var lr = localStorage.getItem(lrKey);
-          var now = Date.now();
-          if (!lr || now - parseInt(lr) > 7200000) {
-            sendNotif('Days Tracking Pro', 'Don\'t forget to mark today!');
-            localStorage.setItem(lrKey, String(now));
-          }
-        }
-
-        var yd = new Date();
-        yd.setDate(yd.getDate() - 1);
-        var ydk = fmtKey(yd);
-        var yds = userData.trackerData[ydk];
-        if (yds === 'none') {
-          var ly = localStorage.getItem(lyKey);
-          var n2 = Date.now();
-          if (!ly || n2 - parseInt(ly) > 86400000) {
-            sendNotif('Missed Yesterday!', 'You forgot to mark yesterday.');
-            localStorage.setItem(lyKey, String(n2));
-          }
-        }
-      }
-
-      function checkStreakNotif() {
-        if (!userData || !isNotifOn() || !activeEmail) return;
-        var start = getStartDate();
-        var days = userData.daysCount || 30;
-        var cur = 0;
-        for (var j = days - 1; j >= 0; j--) {
-          var d = new Date(start);
-          d.setDate(start.getDate() + j);
-          if (userData.trackerData[fmtKey(d)] === 'checked') cur++;
-          else if (cur > 0) break;
-        }
-        if (cur > 0 && cur % 5 === 0) {
-          var snKey = 'dtp_sn_' + activeEmail;
-          var ls = localStorage.getItem(snKey);
-          if (ls !== String(cur)) {
-            sendNotif('Streak: ' + cur + ' days!', 'Keep the momentum going!');
-            localStorage.setItem(snKey, String(cur));
-          }
-        }
-      }
-
-      function startNotifs() {
-        if (notifInterval) clearInterval(notifInterval);
-        setTimeout(function () {
-          checkReminders();
-          checkStreakNotif();
-        }, 3000);
-        notifInterval = setInterval(checkReminders, 1800000);
-      }
-
-      // ==========================================
-      // DEFAULTS & ENSURE
-      // ==========================================
-      function makeDef(n, e) {
-        return {
-          profileName: n,
-          profileEmail: e,
-          habitName: 'My Target Habit',
-          customStart: null,
-          daysCount: 30,
-          fadeDuration: DEFAULT_FADE,
-          trackerData: {},
-          timestamps: {},
-          locked: {},
-          history: [],
-          lastActive: Date.now()
-        };
-      }
-
-      function ensure(u) {
-        if (!u.trackerData) u.trackerData = {};
-        if (!u.timestamps) u.timestamps = {};
-        if (!u.locked) u.locked = {};
-        if (!u.history) u.history = [];
-        if (!u.habitName) u.habitName = 'My Target Habit';
-        if (u.fadeDuration === undefined || u.fadeDuration === null) u.fadeDuration = DEFAULT_FADE;
-        if (u.customStart === undefined) u.customStart = null;
-        if (u.daysCount === undefined) u.daysCount = 30;
-        return u;
-      }
-
-      // ==========================================
-      // THEME
-      // ==========================================
-      var THEMES = ['dark', 'light', 'grey'];
-      var THEME_LABEL = { dark: '\u263E Dark', light: '\u2600 Light', grey: '\u25D1 Grey' };
-
-      function applyTheme(t) {
-        if (t === 'dark') document.body.removeAttribute('data-theme');
-        else document.body.setAttribute('data-theme', t);
-      }
-
-      function initTheme() {
-        var s = localStorage.getItem('theme') || 'dark';
-        if (THEMES.indexOf(s) === -1) s = 'dark';
-        applyTheme(s);
-        updateThemeUI();
-      }
-
-      window.toggleTheme = function () {
-        var cur = document.body.getAttribute('data-theme') || 'dark';
-        var next = THEMES[(THEMES.indexOf(cur) + 1) % THEMES.length];
-        applyTheme(next);
-        localStorage.setItem('theme', next);
-        updateThemeUI();
-      };
-
-      function updateThemeUI() {
-        var cur = document.body.getAttribute('data-theme') || 'dark';
-        var l = THEME_LABEL[cur];
-        var e1 = document.getElementById('theme-toggle');
-        var e2 = document.getElementById('login-theme-toggle');
-        if (e1) e1.innerText = l;
-        if (e2) e2.innerText = l;
-      }
-
-      // ==========================================
-      // TOAST
-      // ==========================================
-      function toast(m, t) {
-        var e = document.getElementById('toast');
-        e.textContent = m;
-        e.className = 'toast show' + (t ? ' toast-' + t : '');
-        setTimeout(function () { e.className = 'toast'; }, 3000);
-      }
-
-      // ==========================================
-      // SCREENS
-      // ==========================================
-      function showLogin() {
-        document.getElementById('app-screen').classList.remove('active-screen');
-        document.getElementById('app-screen').style.display = 'none';
-        document.getElementById('login-screen').classList.add('active-screen');
-      }
-
-      function showApp() {
-        document.getElementById('login-screen').classList.remove('active-screen');
-        document.getElementById('app-screen').classList.add('active-screen');
-        document.getElementById('app-screen').style.display = 'flex';
-        if (!userData) { showLogin(); return; }
-        ensure(userData);
-        userData.lastActive = Date.now();
-        document.getElementById('greeting-name').innerText = 'Hi, ' + userData.profileName;
-        document.getElementById('greeting-email').innerText = userData.profileEmail;
-        document.getElementById('habit-name-input').value = userData.habitName;
-        updateTimerDisplay();
+    window.toggleNotifications = function () {
+      if (isNotifOn()) {
+        localStorage.setItem('dtp_notif', 'off');
         updateNotifUI();
-        initTracker();
-        renderHistory();
-        startInterval();
-        if (isNotifOn()) startNotifs();
+        toast('Notifications muted.', '');
+        return;
+      }
+      if (!('Notification' in window)) { toast('Not supported in this browser.', 'error'); return; }
+      if (Notification.permission === 'granted') {
+        localStorage.setItem('dtp_notif', 'on');
+        updateNotifUI(); toast('Notifications on!', 'success'); startNotifs();
+      } else if (Notification.permission === 'denied') {
+        toast('Blocked. Enable in browser settings.', 'error');
+      } else {
+        Notification.requestPermission().then(function (p) {
+          if (p === 'granted') {
+            localStorage.setItem('dtp_notif', 'on'); updateNotifUI(); toast('Notifications on!', 'success'); startNotifs();
+          } else { toast('Denied.', 'error'); }
+        });
+      }
+    };
+
+    function sendNotif(t, b) {
+      if (!isNotifOn() || !('Notification' in window) || Notification.permission !== 'granted') return;
+      try { new Notification(t, { body: b, icon: './icon-192.png' }); } 
+      catch (e) {
+        if (navigator.serviceWorker && navigator.serviceWorker.ready) {
+          navigator.serviceWorker.ready.then(function (r) { r.showNotification(t, { body: b, icon: './icon-192.png' }); });
+        }
+      }
+    }
+
+    function checkReminders() {
+      if (!userData || !isNotifOn() || !activeEmail) return;
+      var today = fmtKey(new Date());
+      var s = userData.trackerData[today];
+      var lrKey = 'dtp_lr_' + activeEmail;
+      var lyKey = 'dtp_ly_' + activeEmail;
+
+      if (!s || s === 'none') {
+        var lr = localStorage.getItem(lrKey);
+        var now = Date.now();
+        if (!lr || now - parseInt(lr) > 7200000) {
+          sendNotif('Days Tracking Pro', 'Don\'t forget to mark today!');
+          localStorage.setItem(lrKey, String(now));
+        }
       }
 
-      // ==========================================
-      // LOGIN / LOGOUT
-      // ==========================================
-      window.login = function (fn, fe) {
-        var name = fn || document.getElementById('username-input').value.trim();
-        var email = fe || document.getElementById('useremail-input').value.trim();
-        var st = document.getElementById('login-status');
-        st.className = 'status-msg';
-
-        if (!name || !email) {
-          st.className = 'status-msg status-error';
-          st.innerText = 'Both fields required.';
-          return;
+      var yd = new Date(); yd.setDate(yd.getDate() - 1);
+      var ydk = fmtKey(yd);
+      var yds = userData.trackerData[ydk];
+      if (yds === 'none') {
+        var ly = localStorage.getItem(lyKey);
+        var n2 = Date.now();
+        if (!ly || n2 - parseInt(ly) > 86400000) {
+          sendNotif('Missed Yesterday!', 'You forgot to mark yesterday.');
+          localStorage.setItem(lyKey, String(n2));
         }
-        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-          st.className = 'status-msg status-error';
-          st.innerText = 'Invalid email.';
-          return;
-        }
+      }
+    }
 
-        activeEmail = email;
-        lastCloudUpdatedAt = null;
-        loadCloud(email, function (cloud) {
+    function checkStreakNotif() {
+      if (!userData || !isNotifOn() || !activeEmail) return;
+      var start = getStartDate();
+      var days = userData.daysCount || 30;
+      var cur = 0;
+      for (var j = days - 1; j >= 0; j--) {
+        var d = new Date(start); d.setDate(start.getDate() + j);
+        if (userData.trackerData[fmtKey(d)] === 'checked') cur++;
+        else if (cur > 0) break;
+      }
+      if (cur > 0 && cur % 5 === 0) {
+        var snKey = 'dtp_sn_' + activeEmail;
+        var ls = localStorage.getItem(snKey);
+        if (ls !== String(cur)) {
+          sendNotif('Streak: ' + cur + ' days!', 'Keep the momentum going!');
+          localStorage.setItem(snKey, String(cur));
+        }
+      }
+    }
+
+    function startNotifs() {
+      if (notifInterval) clearInterval(notifInterval);
+      setTimeout(function () { checkReminders(); checkStreakNotif(); }, 3000);
+      notifInterval = setInterval(checkReminders, 1800000);
+    }
+
+    // ==========================================
+    // DEFAULTS & ENSURE
+    // ==========================================
+    function makeDef(n, e) {
+      return { profileName: n, profileEmail: e, habitName: 'My Target Habit', customStart: null, daysCount: 30, fadeDuration: DEFAULT_FADE, trackerData: {}, timestamps: {}, locked: {}, history: [], lastActive: Date.now() };
+    }
+
+    function ensure(u) {
+      if (!u.trackerData) u.trackerData = {};
+      if (!u.timestamps) u.timestamps = {};
+      if (!u.locked) u.locked = {};
+      if (!u.history) u.history = [];
+      if (!u.habitName) u.habitName = 'My Target Habit';
+      if (u.fadeDuration === undefined || u.fadeDuration === null) u.fadeDuration = DEFAULT_FADE;
+      if (u.customStart === undefined) u.customStart = null;
+      if (u.daysCount === undefined) u.daysCount = 30;
+      return u;
+    }
+
+    // ==========================================
+    // THEME & TOAST
+    // ==========================================
+    var THEMES = ['dark', 'light', 'grey'];
+    var THEME_LABEL = { dark: '\u263E Dark', light: '\u2600 Light', grey: '\u25D1 Grey' };
+
+    function applyTheme(t) {
+      if (t === 'dark') document.body.removeAttribute('data-theme');
+      else document.body.setAttribute('data-theme', t);
+    }
+
+    function initTheme() {
+      var s = localStorage.getItem('theme') || 'dark';
+      if (THEMES.indexOf(s) === -1) s = 'dark';
+      applyTheme(s); updateThemeUI();
+    }
+
+    window.toggleTheme = function () {
+      var cur = document.body.getAttribute('data-theme') || 'dark';
+      var next = THEMES[(THEMES.indexOf(cur) + 1) % THEMES.length];
+      applyTheme(next); localStorage.setItem('theme', next); updateThemeUI();
+    };
+
+    function updateThemeUI() {
+      var cur = document.body.getAttribute('data-theme') || 'dark';
+      var l = THEME_LABEL[cur];
+      var e1 = document.getElementById('theme-toggle');
+      var e2 = document.getElementById('login-theme-toggle');
+      if (e1) e1.innerText = l;
+      if (e2) e2.innerText = l;
+    }
+
+    function toast(m, t) {
+      var e = document.getElementById('toast');
+      e.textContent = m; e.className = 'toast show' + (t ? ' toast-' + t : '');
+      setTimeout(function () { e.className = 'toast'; }, 3000);
+    }
+
+    // ==========================================
+    // SCREENS
+    // ==========================================
+    function showLogin() {
+      document.getElementById('app-screen').classList.remove('active-screen');
+      document.getElementById('app-screen').style.display = 'none';
+      document.getElementById('login-screen').classList.add('active-screen');
+    }
+
+    function showApp() {
+      document.getElementById('login-screen').classList.remove('active-screen');
+      document.getElementById('app-screen').classList.add('active-screen');
+      document.getElementById('app-screen').style.display = 'flex';
+      if (!userData) { showLogin(); return; }
+      ensure(userData);
+      userData.lastActive = Date.now();
+      document.getElementById('greeting-name').innerText = 'Hi, ' + userData.profileName;
+      document.getElementById('greeting-email').innerText = userData.profileEmail;
+      document.getElementById('habit-name-input').value = userData.habitName;
+      updateTimerDisplay(); updateNotifUI(); initTracker(); renderHistory(); startInterval();
+      if (isNotifOn()) startNotifs();
+    }
+
+    // ==========================================
+    // LOGIN / LOGOUT (UPDATED FOR FIREBASE)
+    // ==========================================
+    window.login = async function (fn, fe) {
+      var name = fn || document.getElementById('username-input').value.trim();
+      var email = fe || document.getElementById('useremail-input').value.trim();
+      var password = document.getElementById('userpassword-input') ? document.getElementById('userpassword-input').value : "";
+      var st = document.getElementById('login-status');
+      st.className = 'status-msg';
+
+      if (!name || !email) {
+        st.className = 'status-msg status-error'; st.innerText = 'Both fields required.'; return;
+      }
+      if (!isGuest(email) && password.length < 6) {
+        st.className = 'status-msg status-error'; st.innerText = 'Password must be at least 6 characters.'; return;
+      }
+      
+      activeEmail = email;
+      lastCloudUpdatedAt = null;
+
+      if (isGuest(email)) {
+        finishLoginSetup(name, email, "guest");
+      } else {
+        try {
+          // Attempt Login
+          const userCredential = await signInWithEmailAndPassword(auth, email, password);
+          activeUid = userCredential.user.uid;
+          finishLoginSetup(name, email, activeUid);
+        } catch (error) {
+          // If User doesn't exist, Create them instead
+          if(error.code === 'auth/user-not-found' || error.code === 'auth/invalid-credential' || error.code === 'auth/invalid-login-credentials') {
+             try {
+                const newCredential = await createUserWithEmailAndPassword(auth, email, password);
+                activeUid = newCredential.user.uid;
+                finishLoginSetup(name, email, activeUid);
+             } catch (createError) {
+                st.className = 'status-msg status-error'; st.innerText = 'Error: ' + createError.message; return;
+             }
+          } else {
+             st.className = 'status-msg status-error'; st.innerText = 'Error: ' + error.message; return;
+          }
+        }
+      }
+    };
+
+    function finishLoginSetup(name, email, uid) {
+        loadCloud(uid, email, function (cloud) {
           var local = loadLocal(email);
           var localEditTs = parseInt(localStorage.getItem('dtp_lastedit_' + email) || '0', 10);
           var cloudTs = lastCloudUpdatedAt ? new Date(lastCloudUpdatedAt).getTime() : 0;
 
-          if (cloud && local && localEditTs > cloudTs) {
-            // This device has offline edits newer than what's in the cloud - keep them, they'll push up.
-            userData = local;
-          } else if (cloud) {
-            userData = cloud;
-          } else if (local) {
-            userData = local;
-          } else {
-            userData = makeDef(name, email);
-          }
+          if (cloud && local && localEditTs > cloudTs) { userData = local; } 
+          else if (cloud) { userData = cloud; } 
+          else if (local) { userData = local; } 
+          else { userData = makeDef(name, email); }
+          
           userData.profileName = name;
           ensure(userData);
           saveAll();
@@ -2080,725 +2054,392 @@
           if (!isGuest(email)) startPullPolling(); else setSS('guest');
           toast('Welcome, ' + name + '!', 'success');
         });
-      };
+    }
 
-      window.logout = function () {
-        stopInterval();
-        stopPullPolling();
-        if (notifInterval) clearInterval(notifInterval);
-        saveAll();
-        activeEmail = null;
-        userData = null;
-        lastCloudUpdatedAt = null;
-        localStorage.removeItem('dtp_active');
-        showLogin();
-      };
+    window.logout = function () {
+      stopInterval(); stopPullPolling();
+      if (notifInterval) clearInterval(notifInterval);
+      saveAll();
+      activeEmail = null; activeUid = null; userData = null; lastCloudUpdatedAt = null;
+      localStorage.removeItem('dtp_active');
+      signOut(auth).then(() => { showLogin(); });
+    };
 
-      // ==========================================
-      // TRACKER
-      // ==========================================
-      function getStartDate() {
-        if (!userData) return new Date();
-        if (userData.customStart) return new Date(userData.customStart);
-        var n = new Date();
-        return new Date(n.getFullYear(), n.getMonth(), 1);
+    // ==========================================
+    // TRACKER
+    // ==========================================
+    function getStartDate() {
+      if (!userData) return new Date();
+      if (userData.customStart) return new Date(userData.customStart);
+      var n = new Date(); return new Date(n.getFullYear(), n.getMonth(), 1);
+    }
+
+    function initTracker() {
+      if (!userData) return;
+      var start = getStartDate(); var days = userData.daysCount || 30;
+      for (var i = 0; i < days; i++) {
+        var d = new Date(start); d.setDate(start.getDate() + i);
+        var dk = fmtKey(d);
+        if (!userData.trackerData[dk]) userData.trackerData[dk] = 'none';
+        if (!userData.timestamps[dk]) userData.timestamps[dk] = Date.now();
       }
+      document.getElementById('month-year-display').innerText = MO[start.getMonth()] + ' ' + start.getDate() + ', ' + start.getFullYear() + ' \u2022 ' + days + 'd';
+      document.getElementById('adj-day').value = start.getDate(); document.getElementById('adj-month').value = start.getMonth();
+      document.getElementById('adj-year').value = start.getFullYear(); document.getElementById('adj-days-count').value = days;
+      renderGrid(start, days); updateStats(); updateStreak();
+    }
 
-      function initTracker() {
-        if (!userData) return;
-        var start = getStartDate();
-        var days = userData.daysCount || 30;
+    function renderGrid(start, days) {
+      var g = document.getElementById('days-grid'); g.innerHTML = '';
+      if (!userData) return;
+      var lockedAny = false;
 
-        for (var i = 0; i < days; i++) {
-          var d = new Date(start);
-          d.setDate(start.getDate() + i);
-          var dk = fmtKey(d);
-          if (!userData.trackerData[dk]) userData.trackerData[dk] = 'none';
-          if (!userData.timestamps[dk]) userData.timestamps[dk] = Date.now();
+      for (var i = 0; i < days; i++) {
+        var d = new Date(start); d.setDate(start.getDate() + i);
+        var dk = fmtKey(d);
+        if (userData.locked[dk]) continue;
+        var state = userData.trackerData[dk] || 'none';
+
+        if (state !== 'none') {
+          var fsCheck = getFadeS(dk);
+          if (fsCheck === 'expired') { userData.locked[dk] = true; lockedAny = true; continue; }
         }
 
-        document.getElementById('month-year-display').innerText =
-          MO[start.getMonth()] + ' ' + start.getDate() + ', ' + start.getFullYear() + ' \u2022 ' + days + 'd';
-        document.getElementById('adj-day').value = start.getDate();
-        document.getElementById('adj-month').value = start.getMonth();
-        document.getElementById('adj-year').value = start.getFullYear();
-        document.getElementById('adj-days-count').value = days;
+        var box = document.createElement('div'); box.className = 'day-box'; box.setAttribute('data-key', dk);
+        box.style.animationDelay = (i * 0.025) + 's';
+        if (state === 'checked') box.classList.add('state-checked');
+        else if (state === 'crossed') box.classList.add('state-crossed');
 
-        renderGrid(start, days);
-        updateStats();
-        updateStreak();
-      }
-
-      function renderGrid(start, days) {
-        var g = document.getElementById('days-grid');
-        g.innerHTML = '';
-        if (!userData) return;
-        var lockedAny = false;
-
-        for (var i = 0; i < days; i++) {
-          var d = new Date(start);
-          d.setDate(start.getDate() + i);
-          var dk = fmtKey(d);
-          if (userData.locked[dk]) continue;
-          var state = userData.trackerData[dk] || 'none';
-
-          if (state !== 'none') {
-            var fsCheck = getFadeS(dk);
-            if (fsCheck === 'expired') {
-              userData.locked[dk] = true;
-              lockedAny = true;
-              continue;
-            }
-          }
-
-          var box = document.createElement('div');
-          box.className = 'day-box';
-          box.setAttribute('data-key', dk);
-          box.style.animationDelay = (i * 0.025) + 's';
-
-          if (state === 'checked') box.classList.add('state-checked');
-          else if (state === 'crossed') box.classList.add('state-crossed');
-
-          var badge = '';
-          if (state !== 'none') {
-            var fs = getFadeS(dk);
-            if (fs !== 'none') {
-              badge = '<span class="timer-badge' + (fs.urgent ? ' urgent' : '') + '">' + fs.text + '</span>';
-            }
-          }
-
-          box.innerHTML = badge +
-            '<span class="day-name">' + DS[d.getDay()] + '</span>' +
-            '<span class="date-num">' + d.getDate() + '</span>' +
-            '<div class="action-space">' +
-              '<button class="action-btn btn-check" onclick="markDay(\'' + dk + '\',\'checked\')">\u2713</button>' +
-              '<button class="action-btn btn-cross" onclick="markDay(\'' + dk + '\',\'crossed\')">\u2717</button>' +
-            '</div>';
-
-          g.appendChild(box);
-        }
-
-        if (lockedAny) saveAll();
-      }
-
-      // ==========================================
-      // MARK DAY
-      // ==========================================
-      window.markDay = function (dk, ns) {
-        if (!userData) return;
-        if (userData.locked[dk]) { toast('This day has expired and is locked.', 'error'); return; }
-        var cur = userData.trackerData[dk] || 'none';
-        userData.trackerData[dk] = (cur === ns) ? 'none' : ns;
-        userData.timestamps[dk] = Date.now();
-        saveAll();
-
-        var box = document.querySelector('[data-key="' + dk + '"]');
-        if (box) {
-          box.classList.remove('state-checked', 'state-crossed', 'fading-out');
-          box.style.animation = 'none';
-          box.offsetHeight;
-          var s = userData.trackerData[dk];
-          if (s === 'checked') box.classList.add('state-checked');
-          else if (s === 'crossed') box.classList.add('state-crossed');
-          box.style.animation = '';
-
-          var b = box.querySelector('.timer-badge');
-          if (b) b.remove();
-
-          if (s !== 'none') {
-            var fs2 = getFadeS(dk);
-            if (fs2 === 'expired') {
-              box.classList.add('fading-out');
-              var eb = document.createElement('span');
-              eb.className = 'timer-badge expired';
-              eb.textContent = 'EXPIRED';
-              box.prepend(eb);
-            } else if (fs2 !== 'none') {
-              var nb = document.createElement('span');
-              nb.className = 'timer-badge' + (fs2.urgent ? ' urgent' : '');
-              nb.textContent = fs2.text;
-              box.prepend(nb);
-            }
-          }
-        }
-
-        updateStats();
-        updateStreak();
-        checkStreakNotif();
-      };
-
-      // ==========================================
-      // TIMER / FADE LOGIC
-      // ==========================================
-      function getFD() {
-        if (!userData) return DEFAULT_FADE;
-        var f = userData.fadeDuration;
-        return f === 'never' ? 'never' : (f || DEFAULT_FADE);
-      }
-
-      function getFadeS(dk) {
-        var fd = getFD();
-        if (fd === 'never') return 'none';
-        if (!userData) return 'none';
-        var ts = userData.timestamps[dk];
-        if (!ts) return 'none';
-
-        var rem = fd - (Date.now() - ts);
-        if (rem <= 0) return 'expired';
-
-        var text;
-        if (rem < 60000) text = Math.ceil(rem / 1000) + 's';
-        else if (rem < 3600000) text = Math.ceil(rem / 60000) + 'm';
-        else {
-          var h = Math.floor(rem / 3600000);
-          var m = Math.floor((rem % 3600000) / 60000);
-          text = (h < 5 && m > 0) ? h + 'h ' + m + 'm' : h + 'h';
-        }
-        return { text: text, urgent: rem < fd * 0.1 };
-      }
-
-      function startInterval() {
-        stopInterval();
-        cInterval = setInterval(tickT, 1000);
-      }
-
-      function stopInterval() {
-        if (cInterval) { clearInterval(cInterval); cInterval = null; }
-      }
-
-      function tickT() {
-        if (!userData || getFD() === 'never') return;
-        var boxes = document.querySelectorAll('.day-box');
-        var lockedAny = false;
-
-        for (var i = 0; i < boxes.length; i++) {
-          var box = boxes[i];
-          var dk = box.getAttribute('data-key');
-          var state = userData.trackerData[dk] || 'none';
-          if (state === 'none' || userData.locked[dk]) continue;
-
+        var badge = '';
+        if (state !== 'none') {
           var fs = getFadeS(dk);
-          var badge = box.querySelector('.timer-badge');
-
-          if (fs === 'none') {
-            if (badge) badge.remove();
-            box.classList.remove('fading-out');
-            continue;
-          }
-
-          if (fs === 'expired') {
-            userData.locked[dk] = true;
-            lockedAny = true;
-            box.remove();
-          } else {
-            box.classList.remove('fading-out');
-            var c = 'timer-badge' + (fs.urgent ? ' urgent' : '');
-            if (badge) {
-              badge.className = c;
-              badge.textContent = fs.text;
-            } else {
-              var n2 = document.createElement('span');
-              n2.className = c;
-              n2.textContent = fs.text;
-              box.prepend(n2);
-            }
-          }
+          if (fs !== 'none') { badge = '<span class="timer-badge' + (fs.urgent ? ' urgent' : '') + '">' + fs.text + '</span>'; }
         }
 
-        if (lockedAny) {
-          saveAll();
-          updateStats();
-          updateStreak();
+        box.innerHTML = badge + '<span class="day-name">' + DS[d.getDay()] + '</span><span class="date-num">' + d.getDate() + '</span><div class="action-space"><button class="action-btn btn-check" onclick="window.markDay(\'' + dk + '\',\'checked\')">\u2713</button><button class="action-btn btn-cross" onclick="window.markDay(\'' + dk + '\',\'crossed\')">\u2717</button></div>';
+        g.appendChild(box);
+      }
+      if (lockedAny) saveAll();
+    }
+
+    // ==========================================
+    // MARK DAY
+    // ==========================================
+    window.markDay = function (dk, ns) {
+      if (!userData) return;
+      if (userData.locked[dk]) { toast('This day has expired and is locked.', 'error'); return; }
+      var cur = userData.trackerData[dk] || 'none';
+      userData.trackerData[dk] = (cur === ns) ? 'none' : ns;
+      userData.timestamps[dk] = Date.now(); saveAll();
+
+      var box = document.querySelector('[data-key="' + dk + '"]');
+      if (box) {
+        box.classList.remove('state-checked', 'state-crossed', 'fading-out'); box.style.animation = 'none'; box.offsetHeight;
+        var s = userData.trackerData[dk];
+        if (s === 'checked') box.classList.add('state-checked'); else if (s === 'crossed') box.classList.add('state-crossed');
+        box.style.animation = '';
+        var b = box.querySelector('.timer-badge'); if (b) b.remove();
+        if (s !== 'none') {
+          var fs2 = getFadeS(dk);
+          if (fs2 === 'expired') {
+            box.classList.add('fading-out'); var eb = document.createElement('span'); eb.className = 'timer-badge expired'; eb.textContent = 'EXPIRED'; box.prepend(eb);
+          } else if (fs2 !== 'none') {
+            var nb = document.createElement('span'); nb.className = 'timer-badge' + (fs2.urgent ? ' urgent' : ''); nb.textContent = fs2.text; box.prepend(nb);
+          }
         }
       }
-      window.setTimerPreset = function (btn) {
-        if (!userData) return;
+      updateStats(); updateStreak(); checkStreakNotif();
+    };
+
+    // ==========================================
+    // TIMER / FADE LOGIC
+    // ==========================================
+    function getFD() {
+      if (!userData) return DEFAULT_FADE; var f = userData.fadeDuration; return f === 'never' ? 'never' : (f || DEFAULT_FADE);
+    }
+
+    function getFadeS(dk) {
+      var fd = getFD(); if (fd === 'never') return 'none'; if (!userData) return 'none';
+      var ts = userData.timestamps[dk]; if (!ts) return 'none';
+      var rem = fd - (Date.now() - ts); if (rem <= 0) return 'expired';
+      var text;
+      if (rem < 60000) text = Math.ceil(rem / 1000) + 's'; else if (rem < 3600000) text = Math.ceil(rem / 60000) + 'm';
+      else { var h = Math.floor(rem / 3600000); var m = Math.floor((rem % 3600000) / 60000); text = (h < 5 && m > 0) ? h + 'h ' + m + 'm' : h + 'h'; }
+      return { text: text, urgent: rem < fd * 0.1 };
+    }
+
+    function startInterval() { stopInterval(); cInterval = setInterval(tickT, 1000); }
+    function stopInterval() { if (cInterval) { clearInterval(cInterval); cInterval = null; } }
+
+    function tickT() {
+      if (!userData || getFD() === 'never') return;
+      var boxes = document.querySelectorAll('.day-box'); var lockedAny = false;
+      for (var i = 0; i < boxes.length; i++) {
+        var box = boxes[i]; var dk = box.getAttribute('data-key'); var state = userData.trackerData[dk] || 'none';
+        if (state === 'none' || userData.locked[dk]) continue;
+        var fs = getFadeS(dk); var badge = box.querySelector('.timer-badge');
+        if (fs === 'none') { if (badge) badge.remove(); box.classList.remove('fading-out'); continue; }
+        if (fs === 'expired') { userData.locked[dk] = true; lockedAny = true; box.remove(); } 
+        else {
+          box.classList.remove('fading-out'); var c = 'timer-badge' + (fs.urgent ? ' urgent' : '');
+          if (badge) { badge.className = c; badge.textContent = fs.text; } 
+          else { var n2 = document.createElement('span'); n2.className = c; n2.textContent = fs.text; box.prepend(n2); }
+        }
+      }
+      if (lockedAny) { saveAll(); updateStats(); updateStreak(); }
+    }
+
+    window.setTimerPreset = function (btn) {
+      if (!userData) return;
+      var ms = btn.getAttribute('data-ms');
+      document.querySelectorAll('.timer-preset-btn').forEach(function (b) { b.classList.remove('active'); });
+      btn.classList.add('active');
+      if (ms === 'never') {
+        userData.fadeDuration = 'never'; saveAll(); updateTimerDisplay();
+        document.querySelectorAll('.day-box').forEach(function (b) { b.classList.remove('fading-out'); var x = b.querySelector('.timer-badge'); if (x) x.remove(); });
+        toast('Timer off.', '');
+      } else {
+        userData.fadeDuration = parseInt(ms); saveAll(); updateTimerDisplay(); resetUnmarked(); initTracker(); toast('Timer set!', 'success');
+      }
+    };
+
+    window.applyCustomTimer = function () {
+      var input = document.getElementById('custom-timer-input').value.trim(); if (!input) return;
+      var ms = parseT(input); if (!ms || ms <= 0) { toast('Invalid format.', 'error'); return; }
+      if (!userData) return;
+      userData.fadeDuration = ms; saveAll(); updateTimerDisplay();
+      document.querySelectorAll('.timer-preset-btn').forEach(function (b) { b.classList.remove('active'); });
+      resetUnmarked(); initTracker(); document.getElementById('custom-timer-input').value = ''; toast('Timer set!', 'success');
+    };
+
+    function parseT(s) {
+      s = s.toLowerCase().trim(); var t = 0, m = false;
+      var hm = s.match(/(\d+(?:\.\d+)?)\s*h/); if (hm) { t += parseFloat(hm[1]) * 3600000; m = true; }
+      var mm = s.match(/(\d+(?:\.\d+)?)\s*m(?!s)/); if (mm) { t += parseFloat(mm[1]) * 60000; m = true; }
+      var sm = s.match(/(\d+(?:\.\d+)?)\s*s/); if (sm) { t += parseFloat(sm[1]) * 1000; m = true; }
+      if (!m) { var n = parseFloat(s); if (!isNaN(n)) { t = n * 60000; m = true; } }
+      return m ? t : null;
+    }
+
+    function resetUnmarked() {
+      if (!userData) return;
+      var start = getStartDate(); var days = userData.daysCount || 30;
+      for (var i = 0; i < days; i++) {
+        var d = new Date(start); d.setDate(start.getDate() + i); var dk = fmtKey(d);
+        if (userData.trackerData[dk] && userData.trackerData[dk] !== 'none') { userData.timestamps[dk] = Date.now(); }
+      }
+      saveAll();
+    }
+
+    function updateTimerDisplay() {
+      var dur = getFD(); var el = document.getElementById('current-timer-label');
+      if (dur === 'never') el.innerText = 'Never';
+      else if (dur < 60000) el.innerText = Math.round(dur / 1000) + 's';
+      else if (dur < 3600000) el.innerText = Math.round(dur / 60000) + 'm';
+      else if (dur < 86400000) { var h = dur / 3600000; el.innerText = (h % 1 === 0 ? h : h.toFixed(1)) + 'h'; } 
+      else { var dd = dur / 86400000; el.innerText = (dd % 1 === 0 ? dd : dd.toFixed(1)) + 'd'; }
+      document.querySelectorAll('.timer-preset-btn').forEach(function (btn) {
         var ms = btn.getAttribute('data-ms');
-        document.querySelectorAll('.timer-preset-btn').forEach(function (b) { b.classList.remove('active'); });
-        btn.classList.add('active');
+        if (dur === 'never' && ms === 'never') btn.classList.add('active');
+        else if (parseInt(ms) === dur) btn.classList.add('active');
+        else btn.classList.remove('active');
+      });
+    }
 
-        if (ms === 'never') {
-          userData.fadeDuration = 'never';
-          saveAll();
-          updateTimerDisplay();
-          document.querySelectorAll('.day-box').forEach(function (b) {
-            b.classList.remove('fading-out');
-            var x = b.querySelector('.timer-badge');
-            if (x) x.remove();
-          });
-          toast('Timer off.', '');
-        } else {
-          userData.fadeDuration = parseInt(ms);
-          saveAll();
-          updateTimerDisplay();
-          resetUnmarked();
-          initTracker();
-          toast('Timer set!', 'success');
-        }
-      };
+    // ==========================================
+    // DATE ADJUSTMENT
+    // ==========================================
+    window.toggleDateAdjust = function () { document.getElementById('date-adjust-panel').classList.toggle('open'); document.getElementById('timer-adjust-panel').classList.remove('open'); };
+    window.toggleTimerAdjust = function () { document.getElementById('timer-adjust-panel').classList.toggle('open'); document.getElementById('date-adjust-panel').classList.remove('open'); };
+    window.applyDateAdjust = function () {
+      if (!userData) return;
+      var day = parseInt(document.getElementById('adj-day').value) || 1; var month = parseInt(document.getElementById('adj-month').value);
+      var year = parseInt(document.getElementById('adj-year').value) || 2026; var cnt = Math.max(1, Math.min(366, parseInt(document.getElementById('adj-days-count').value) || 30));
+      day = Math.min(day, new Date(year, month + 1, 0).getDate());
+      userData.customStart = new Date(year, month, day).toISOString(); userData.daysCount = cnt; userData.trackerData = {}; userData.timestamps = {};
+      saveAll(); initTracker(); document.getElementById('date-adjust-panel').classList.remove('open'); toast('Updated!', 'success');
+    };
+    window.resetToDefault = function () {
+      if (!userData) return;
+      userData.customStart = null; userData.daysCount = 30; userData.trackerData = {}; userData.timestamps = {};
+      saveAll(); initTracker(); document.getElementById('date-adjust-panel').classList.remove('open');
+    };
 
-      window.applyCustomTimer = function () {
-        var input = document.getElementById('custom-timer-input').value.trim();
-        if (!input) return;
-        var ms = parseT(input);
-        if (!ms || ms <= 0) { toast('Invalid format.', 'error'); return; }
-        if (!userData) return;
+    // ==========================================
+    // STATS & STREAKS
+    // ==========================================
+    function updateStats() {
+      if (!userData) return;
+      var ck = 0, cr = 0, t = 0;
+      Object.keys(userData.trackerData).forEach(function (k) {
+        t++; if (userData.trackerData[k] === 'checked') ck++; else if (userData.trackerData[k] === 'crossed') cr++;
+      });
+      var p = t - ck - cr; var r = t > 0 ? Math.round((ck / t) * 100) : 0;
+      document.getElementById('stat-checked').textContent = ck; document.getElementById('stat-crossed').textContent = cr;
+      document.getElementById('stat-pending').textContent = p; document.getElementById('stat-rate').textContent = r + '%';
+      var pf = document.getElementById('progress-fill'); pf.style.width = Math.min(100, Math.round(((ck + cr) / (userData.daysCount || 30)) * 100)) + '%';
+      pf.style.background = r >= 70 ? 'var(--green)' : r >= 40 ? 'var(--amber)' : 'var(--red)';
+    }
 
-        userData.fadeDuration = ms;
-        saveAll();
-        updateTimerDisplay();
-        document.querySelectorAll('.timer-preset-btn').forEach(function (b) { b.classList.remove('active'); });
-        resetUnmarked();
-        initTracker();
-        document.getElementById('custom-timer-input').value = '';
-        toast('Timer set!', 'success');
-      };
-
-      function parseT(s) {
-        s = s.toLowerCase().trim();
-        var t = 0, m = false;
-        var hm = s.match(/(\d+(?:\.\d+)?)\s*h/);
-        if (hm) { t += parseFloat(hm[1]) * 3600000; m = true; }
-        var mm = s.match(/(\d+(?:\.\d+)?)\s*m(?!s)/);
-        if (mm) { t += parseFloat(mm[1]) * 60000; m = true; }
-        var sm = s.match(/(\d+(?:\.\d+)?)\s*s/);
-        if (sm) { t += parseFloat(sm[1]) * 1000; m = true; }
-        if (!m) { var n = parseFloat(s); if (!isNaN(n)) { t = n * 60000; m = true; } }
-        return m ? t : null;
+    function updateStreak() {
+      if (!userData) return;
+      var badge = document.getElementById('streak-badge'); var start = getStartDate(); var days = userData.daysCount || 30;
+      var mx = 0, tmp = 0, cur = 0;
+      for (var i = 0; i < days; i++) {
+        var d = new Date(start); d.setDate(start.getDate() + i);
+        if (userData.trackerData[fmtKey(d)] === 'checked') { tmp++; if (tmp > mx) mx = tmp; } else { tmp = 0; }
       }
-
-      function resetUnmarked() {
-        if (!userData) return;
-        var start = getStartDate();
-        var days = userData.daysCount || 30;
-        for (var i = 0; i < days; i++) {
-          var d = new Date(start);
-          d.setDate(start.getDate() + i);
-          var dk = fmtKey(d);
-          if (userData.trackerData[dk] && userData.trackerData[dk] !== 'none') {
-            userData.timestamps[dk] = Date.now();
-          }
-        }
-        saveAll();
+      for (var j = days - 1; j >= 0; j--) {
+        var d2 = new Date(start); d2.setDate(start.getDate() + j);
+        if (userData.trackerData[fmtKey(d2)] === 'checked') cur++; else if (cur > 0) break;
       }
-
-      function updateTimerDisplay() {
-        var dur = getFD();
-        var el = document.getElementById('current-timer-label');
-
-        if (dur === 'never') el.innerText = 'Never';
-        else if (dur < 60000) el.innerText = Math.round(dur / 1000) + 's';
-        else if (dur < 3600000) el.innerText = Math.round(dur / 60000) + 'm';
-        else if (dur < 86400000) {
-          var h = dur / 3600000;
-          el.innerText = (h % 1 === 0 ? h : h.toFixed(1)) + 'h';
-        } else {
-          var dd = dur / 86400000;
-          el.innerText = (dd % 1 === 0 ? dd : dd.toFixed(1)) + 'd';
+      if (cur > 0 || mx > 0) { badge.style.display = 'inline-flex'; badge.innerHTML = '&#128293; ' + cur + (mx > cur ? ' (best: ' + mx + ')' : ''); } 
+      else { badge.style.display = 'none'; }
+      document.querySelectorAll('.day-box.in-streak').forEach(function (b) { b.classList.remove('in-streak'); });
+      if (cur > 0) {
+        for (var k = days - 1; k >= 0; k--) {
+          var dk3 = new Date(start); dk3.setDate(start.getDate() + k); var key3 = fmtKey(dk3);
+          if (userData.trackerData[key3] !== 'checked') break;
+          var box3 = document.querySelector('.day-box[data-key="' + key3 + '"]'); if (box3) box3.classList.add('in-streak');
         }
+      }
+    }
 
-        document.querySelectorAll('.timer-preset-btn').forEach(function (btn) {
-          var ms = btn.getAttribute('data-ms');
-          if (dur === 'never' && ms === 'never') btn.classList.add('active');
-          else if (parseInt(ms) === dur) btn.classList.add('active');
-          else btn.classList.remove('active');
+    // ==========================================
+    // HISTORY & EXPORT
+    // ==========================================
+    function renderHistory() {
+      if (!userData) return;
+      var log = document.getElementById('history-log');
+      if (!userData.history || !userData.history.length) { log.innerHTML = '<div class="empty-state">No records yet.</div>'; return; }
+      log.innerHTML = '';
+      for (var i = 0; i < userData.history.length; i++) {
+        var r = userData.history[i]; var rate = r.total > 0 ? Math.round((r.checked / r.total) * 100) : 0;
+        var item = document.createElement('div'); item.className = 'history-item';
+        item.innerHTML = '<div class="history-info"><strong>' + esc(r.habitName || 'Untitled') + '</strong><div class="history-stats"><span class="stat-green">\u2713 ' + r.checked + '</span><span class="stat-red">\u2717 ' + r.crossed + '</span><span style="color:var(--text-dim)">' + rate + '%</span><span style="color:var(--text-dim)">' + (r.period || '') + '</span></div></div><div class="history-actions"><button class="btn btn-ghost btn-xs" onclick="window.viewRecord(' + i + ')">View</button><button class="btn btn-danger-soft btn-xs" onclick="window.openDeleteModal(' + i + ')">Del</button></div>';
+        log.appendChild(item);
+      }
+    }
+    window.viewRecord = function (i) {
+      if (!userData || !userData.history[i]) return;
+      var r = userData.history[i]; var g = document.getElementById('view-days-grid');
+      document.getElementById('view-modal-title').textContent = r.habitName || 'Record'; g.innerHTML = '';
+      if (r.days) {
+        r.days.forEach(function (day) {
+          var box = document.createElement('div'); box.className = 'day-box readonly-day';
+          if (day.state === 'checked') box.classList.add('state-checked'); else if (day.state === 'crossed') box.classList.add('state-crossed');
+          box.innerHTML = '<span class="day-name">' + (day.dayName || '') + '</span><span class="date-num">' + (day.date || '') + '</span>'; g.appendChild(box);
         });
       }
-
-      // ==========================================
-      // DATE ADJUSTMENT
-      // ==========================================
-      window.toggleDateAdjust = function () {
-        document.getElementById('date-adjust-panel').classList.toggle('open');
-        document.getElementById('timer-adjust-panel').classList.remove('open');
-      };
-
-      window.toggleTimerAdjust = function () {
-        document.getElementById('timer-adjust-panel').classList.toggle('open');
-        document.getElementById('date-adjust-panel').classList.remove('open');
-      };
-
-      window.applyDateAdjust = function () {
-        if (!userData) return;
-        var day = parseInt(document.getElementById('adj-day').value) || 1;
-        var month = parseInt(document.getElementById('adj-month').value);
-        var year = parseInt(document.getElementById('adj-year').value) || 2026;
-        var cnt = Math.max(1, Math.min(366, parseInt(document.getElementById('adj-days-count').value) || 30));
-        day = Math.min(day, new Date(year, month + 1, 0).getDate());
-
-        userData.customStart = new Date(year, month, day).toISOString();
-        userData.daysCount = cnt;
-        userData.trackerData = {};
-        userData.timestamps = {};
-        saveAll();
-        initTracker();
-        document.getElementById('date-adjust-panel').classList.remove('open');
-        toast('Updated!', 'success');
-      };
-
-      window.resetToDefault = function () {
-        if (!userData) return;
-        userData.customStart = null;
-        userData.daysCount = 30;
-        userData.trackerData = {};
-        userData.timestamps = {};
-        saveAll();
-        initTracker();
-        document.getElementById('date-adjust-panel').classList.remove('open');
-      };
-
-      // ==========================================
-      // STATS
-      // ==========================================
-      function updateStats() {
-        if (!userData) return;
-        var ck = 0, cr = 0, t = 0;
-        Object.keys(userData.trackerData).forEach(function (k) {
-          t++;
-          if (userData.trackerData[k] === 'checked') ck++;
-          else if (userData.trackerData[k] === 'crossed') cr++;
-        });
-
-        var p = t - ck - cr;
-        var r = t > 0 ? Math.round((ck / t) * 100) : 0;
-
-        document.getElementById('stat-checked').textContent = ck;
-        document.getElementById('stat-crossed').textContent = cr;
-        document.getElementById('stat-pending').textContent = p;
-        document.getElementById('stat-rate').textContent = r + '%';
-
-        var pf = document.getElementById('progress-fill');
-        pf.style.width = Math.min(100, Math.round(((ck + cr) / (userData.daysCount || 30)) * 100)) + '%';
-        pf.style.background = r >= 70 ? 'var(--green)' : r >= 40 ? 'var(--amber)' : 'var(--red)';
+      document.getElementById('view-modal').classList.add('active');
+    };
+    window.openDeleteModal = function (i) { delIdx = i; document.getElementById('delete-modal').classList.add('active'); };
+    window.confirmDeleteRecord = function () {
+      if (delIdx === null || !userData) return; userData.history.splice(delIdx, 1); delIdx = null; saveAll(); renderHistory(); closeModals(); toast('Deleted.', '');
+    };
+    window.openConfirmModal = function () { document.getElementById('confirm-modal').classList.add('active'); };
+    window.confirmEndMonth = function () {
+      if (!userData) return;
+      var start = getStartDate(); var days = userData.daysCount || 30; var ck = 0, cr = 0, dl = [];
+      for (var i = 0; i < days; i++) {
+        var d = new Date(start); d.setDate(start.getDate() + i); var dk = fmtKey(d); var s = userData.trackerData[dk] || 'none';
+        if (s === 'checked') ck++; else if (s === 'crossed') cr++; dl.push({ date: d.getDate(), dayName: DS[d.getDay()], state: s });
       }
+      var end = new Date(start); end.setDate(start.getDate() + days - 1);
+      var period = MO[start.getMonth()].substr(0, 3) + ' ' + start.getDate() + ' - ' + MO[end.getMonth()].substr(0, 3) + ' ' + end.getDate() + ', ' + end.getFullYear();
+      userData.history.unshift({ habitName: userData.habitName, period: period, checked: ck, crossed: cr, total: days, days: dl, savedAt: Date.now() });
+      userData.trackerData = {}; userData.timestamps = {}; var ns = new Date(end); ns.setDate(ns.getDate() + 1); userData.customStart = ns.toISOString();
+      saveAll(); closeModals(); initTracker(); renderHistory(); toast('Cycle saved!', 'success');
+    };
 
-      function updateStreak() {
-        if (!userData) return;
-        var badge = document.getElementById('streak-badge');
-        var start = getStartDate();
-        var days = userData.daysCount || 30;
-        var mx = 0, tmp = 0, cur = 0;
+    // ==========================================
+    // COMPLAINT / REPORT
+    // ==========================================
+    window.openComplaintModal = function () { document.getElementById('complaint-modal').classList.add('active'); document.getElementById('complaint-status').className = 'status-msg'; document.getElementById('complaint-text').value = ''; document.getElementById('complaint-actions').style.display = 'flex'; document.getElementById('complaint-close-wrap').style.display = 'none'; };
+    window.submitComplaint = function () {
+      var text = document.getElementById('complaint-text').value.trim(); var st = document.getElementById('complaint-status');
+      if (!text) { st.className = 'status-msg status-error'; st.innerText = 'Describe the issue first.'; return; }
+      st.className = 'status-msg'; var fd = new FormData(); fd.append('message', text); fd.append('email', activeEmail || 'unknown'); fd.append('name', userData ? userData.profileName : 'unknown'); fd.append('_subject', 'Days Tracking Pro: Report');
+      fetch('https://formspree.io/f/xbdeqknr', { method: 'POST', body: fd, headers: { 'Accept': 'application/json' } }).then(function (r) {
+        if (r.ok) { st.className = 'status-msg status-success'; st.innerText = 'Sent! We\'ll look into it.'; document.getElementById('complaint-actions').style.display = 'none'; document.getElementById('complaint-close-wrap').style.display = 'block'; } else { st.className = 'status-msg status-error'; st.innerText = 'Failed to send.'; }
+      }).catch(function () { st.className = 'status-msg status-error'; st.innerText = 'Network error.'; });
+    };
 
-        for (var i = 0; i < days; i++) {
-          var d = new Date(start);
-          d.setDate(start.getDate() + i);
-          if (userData.trackerData[fmtKey(d)] === 'checked') {
-            tmp++;
-            if (tmp > mx) mx = tmp;
-          } else {
-            tmp = 0;
-          }
-        }
+    window.closeModals = function () { document.querySelectorAll('.modal-overlay').forEach(function (m) { m.classList.remove('active'); }); delIdx = null; };
+    window.saveHabitName = function () { if (!userData) return; userData.habitName = document.getElementById('habit-name-input').value.trim() || 'My Habit'; saveAll(); };
 
-        for (var j = days - 1; j >= 0; j--) {
-          var d2 = new Date(start);
-          d2.setDate(start.getDate() + j);
-          if (userData.trackerData[fmtKey(d2)] === 'checked') cur++;
-          else if (cur > 0) break;
-        }
+    // ==========================================
+    // UTILITIES
+    // ==========================================
+    function fmtKey(d) { return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); }
+    function esc(s) { var d = document.createElement('div'); d.textContent = s; return d.innerHTML; }
 
-        if (cur > 0 || mx > 0) {
-          badge.style.display = 'inline-flex';
-          badge.innerHTML = '&#128293; ' + cur + (mx > cur ? ' (best: ' + mx + ')' : '');
-        } else {
-          badge.style.display = 'none';
-        }
+    // ==========================================
+    // EVENT LISTENERS
+    // ==========================================
+    document.addEventListener('keydown', function (e) { if (e.key === 'Escape') closeModals(); });
+    document.addEventListener('click', function (e) { if (e.target.classList.contains('modal-overlay')) closeModals(); });
+    var nt = null;
+    document.getElementById('habit-name-input').addEventListener('input', function () { if (nt) clearTimeout(nt); nt = setTimeout(window.saveHabitName, 500); });
+    document.getElementById('userpassword-input').addEventListener('keydown', function (e) { if (e.key === 'Enter') window.login(); });
+    document.getElementById('useremail-input').addEventListener('keydown', function (e) { if (e.key === 'Enter') document.getElementById('userpassword-input').focus(); });
+    document.getElementById('username-input').addEventListener('keydown', function (e) { if (e.key === 'Enter') document.getElementById('useremail-input').focus(); });
+    window.addEventListener('beforeunload', function () { saveLocal(); });
 
-        document.querySelectorAll('.day-box.in-streak').forEach(function (b) { b.classList.remove('in-streak'); });
-        if (cur > 0) {
-          for (var k = days - 1; k >= 0; k--) {
-            var dk3 = new Date(start);
-            dk3.setDate(start.getDate() + k);
-            var key3 = fmtKey(dk3);
-            if (userData.trackerData[key3] !== 'checked') break;
-            var box3 = document.querySelector('.day-box[data-key="' + key3 + '"]');
-            if (box3) box3.classList.add('in-streak');
-          }
-        }
-      }
+    // ==========================================
+    // SERVICE WORKER
+    // ==========================================
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('./sw.js').catch(function () { });
+    }
 
-      // ==========================================
-      // HISTORY
-      // ==========================================
-      function renderHistory() {
-        if (!userData) return;
-        var log = document.getElementById('history-log');
-
-        if (!userData.history || !userData.history.length) {
-          log.innerHTML = '<div class="empty-state">No records yet.</div>';
-          return;
-        }
-
-        log.innerHTML = '';
-        for (var i = 0; i < userData.history.length; i++) {
-          var r = userData.history[i];
-          var rate = r.total > 0 ? Math.round((r.checked / r.total) * 100) : 0;
-          var item = document.createElement('div');
-          item.className = 'history-item';
-          item.innerHTML =
-            '<div class="history-info">' +
-              '<strong>' + esc(r.habitName || 'Untitled') + '</strong>' +
-              '<div class="history-stats">' +
-                '<span class="stat-green">\u2713 ' + r.checked + '</span>' +
-                '<span class="stat-red">\u2717 ' + r.crossed + '</span>' +
-                '<span style="color:var(--text-dim)">' + rate + '%</span>' +
-                '<span style="color:var(--text-dim)">' + (r.period || '') + '</span>' +
-              '</div>' +
-            '</div>' +
-            '<div class="history-actions">' +
-              '<button class="btn btn-ghost btn-xs" onclick="viewRecord(' + i + ')">View</button>' +
-              '<button class="btn btn-danger-soft btn-xs" onclick="openDeleteModal(' + i + ')">Del</button>' +
-            '</div>';
-          log.appendChild(item);
-        }
-      }
-
-      window.viewRecord = function (i) {
-        if (!userData || !userData.history[i]) return;
-        var r = userData.history[i];
-        var g = document.getElementById('view-days-grid');
-        document.getElementById('view-modal-title').textContent = r.habitName || 'Record';
-        g.innerHTML = '';
-
-        if (r.days) {
-          r.days.forEach(function (day) {
-            var box = document.createElement('div');
-            box.className = 'day-box readonly-day';
-            if (day.state === 'checked') box.classList.add('state-checked');
-            else if (day.state === 'crossed') box.classList.add('state-crossed');
-            box.innerHTML = '<span class="day-name">' + (day.dayName || '') + '</span><span class="date-num">' + (day.date || '') + '</span>';
-            g.appendChild(box);
-          });
-        }
-
-        document.getElementById('view-modal').classList.add('active');
-      };
-
-      window.openDeleteModal = function (i) {
-        delIdx = i;
-        document.getElementById('delete-modal').classList.add('active');
-      };
-
-      window.confirmDeleteRecord = function () {
-        if (delIdx === null || !userData) return;
-        userData.history.splice(delIdx, 1);
-        delIdx = null;
-        saveAll();
-        renderHistory();
-        closeModals();
-        toast('Deleted.', '');
-      };
-
-      // ==========================================
-      // END MONTH
-      // ==========================================
-      window.openConfirmModal = function () {
-        document.getElementById('confirm-modal').classList.add('active');
-      };
-
-      window.confirmEndMonth = function () {
-        if (!userData) return;
-        var start = getStartDate();
-        var days = userData.daysCount || 30;
-        var ck = 0, cr = 0, dl = [];
-
-        for (var i = 0; i < days; i++) {
-          var d = new Date(start);
-          d.setDate(start.getDate() + i);
-          var dk = fmtKey(d);
-          var s = userData.trackerData[dk] || 'none';
-          if (s === 'checked') ck++;
-          else if (s === 'crossed') cr++;
-          dl.push({ date: d.getDate(), dayName: DS[d.getDay()], state: s });
-        }
-
-        var end = new Date(start);
-        end.setDate(start.getDate() + days - 1);
-        var period = MO[start.getMonth()].substr(0, 3) + ' ' + start.getDate() + ' - ' +
-          MO[end.getMonth()].substr(0, 3) + ' ' + end.getDate() + ', ' + end.getFullYear();
-
-        userData.history.unshift({
-          habitName: userData.habitName,
-          period: period,
-          checked: ck,
-          crossed: cr,
-          total: days,
-          days: dl,
-          savedAt: Date.now()
-        });
-
-        userData.trackerData = {};
-        userData.timestamps = {};
-        var ns = new Date(end);
-        ns.setDate(ns.getDate() + 1);
-        userData.customStart = ns.toISOString();
-
-        saveAll();
-        closeModals();
-        initTracker();
-        renderHistory();
-        toast('Cycle saved!', 'success');
-      };
-
-      // ==========================================
-      // COMPLAINT / REPORT
-      // ==========================================
-      window.openComplaintModal = function () {
-        document.getElementById('complaint-modal').classList.add('active');
-        document.getElementById('complaint-status').className = 'status-msg';
-        document.getElementById('complaint-text').value = '';
-        document.getElementById('complaint-actions').style.display = 'flex';
-        document.getElementById('complaint-close-wrap').style.display = 'none';
-      };
-
-      window.submitComplaint = function () {
-        var text = document.getElementById('complaint-text').value.trim();
-        var st = document.getElementById('complaint-status');
-
-        if (!text) {
-          st.className = 'status-msg status-error';
-          st.innerText = 'Describe the issue first.';
-          return;
-        }
-
-        st.className = 'status-msg';
-        var fd = new FormData();
-        fd.append('message', text);
-        fd.append('email', activeEmail || 'unknown');
-        fd.append('name', userData ? userData.profileName : 'unknown');
-        fd.append('_subject', 'Days Tracking Pro: Report');
-
-        fetch('https://formspree.io/f/xbdeqknr', {
-          method: 'POST',
-          body: fd,
-          headers: { 'Accept': 'application/json' }
-        }).then(function (r) {
-          if (r.ok) {
-            st.className = 'status-msg status-success';
-            st.innerText = 'Sent! We\'ll look into it.';
-            document.getElementById('complaint-actions').style.display = 'none';
-            document.getElementById('complaint-close-wrap').style.display = 'block';
-          } else {
-            st.className = 'status-msg status-error';
-            st.innerText = 'Failed to send.';
-          }
-        }).catch(function () {
-          st.className = 'status-msg status-error';
-          st.innerText = 'Network error.';
-        });
-      };
-
-      // ==========================================
-      // MODALS
-      // ==========================================
-      window.closeModals = function () {
-        document.querySelectorAll('.modal-overlay').forEach(function (m) {
-          m.classList.remove('active');
-        });
-        delIdx = null;
-      };
-
-      // ==========================================
-      // HABIT NAME
-      // ==========================================
-      window.saveHabitName = function () {
-        if (!userData) return;
-        userData.habitName = document.getElementById('habit-name-input').value.trim() || 'My Habit';
-        saveAll();
-      };
-
-      // ==========================================
-      // UTILITIES
-      // ==========================================
-      function fmtKey(d) {
-        return d.getFullYear() + '-' +
-          String(d.getMonth() + 1).padStart(2, '0') + '-' +
-          String(d.getDate()).padStart(2, '0');
-      }
-
-      function esc(s) {
-        var d = document.createElement('div');
-        d.textContent = s;
-        return d.innerHTML;
-      }
-
-      // ==========================================
-      // EVENT LISTENERS
-      // ==========================================
-      document.addEventListener('keydown', function (e) {
-        if (e.key === 'Escape') closeModals();
-      });
-
-      document.addEventListener('click', function (e) {
-        if (e.target.classList.contains('modal-overlay')) closeModals();
-      });
-
-      var nt = null;
-      document.getElementById('habit-name-input').addEventListener('input', function () {
-        if (nt) clearTimeout(nt);
-        nt = setTimeout(saveHabitName, 500);
-      });
-
-      document.getElementById('useremail-input').addEventListener('keydown', function (e) {
-        if (e.key === 'Enter') login();
-      });
-
-      document.getElementById('username-input').addEventListener('keydown', function (e) {
-        if (e.key === 'Enter') document.getElementById('useremail-input').focus();
-      });
-
-      window.addEventListener('beforeunload', function () {
-        saveLocal();
-      });
-
-      // ==========================================
-      // SERVICE WORKER
-      // ==========================================
-      if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.register('./sw.js').catch(function () { });
-      }
-
-      // ==========================================
-      // INITIALIZATION
-      // ==========================================
-      initTheme();
-      var saved = localStorage.getItem('dtp_active');
-
-      if (saved) {
-        activeEmail = saved;
-        var local = loadLocal(saved);
-        if (local) {
-          userData = local;
-          ensure(userData);
-          showApp();
-          if (!isGuest(saved)) {
+    // ==========================================
+    // INITIALIZATION & AUTH LISTENER
+    // ==========================================
+    initTheme();
+    
+    // Automatically login if they are currently signed into Firebase
+    onAuthStateChanged(auth, (user) => {
+        var saved = localStorage.getItem('dtp_active');
+        if (user) {
+            activeEmail = user.email;
+            activeUid = user.uid;
+            
+            // Sync with backend
             startPullPolling();
             lastCloudUpdatedAt = null;
-            loadCloud(saved, function (cloud) {
-              if (!cloud) return;
-              var localEditTs = parseInt(localStorage.getItem('dtp_lastedit_' + saved) || '0', 10);
+            loadCloud(activeUid, activeEmail, function (cloud) {
+              var localEditTs = parseInt(localStorage.getItem('dtp_lastedit_' + activeEmail) || '0', 10);
               var cloudTs = lastCloudUpdatedAt ? new Date(lastCloudUpdatedAt).getTime() : 0;
-              if (cloudTs > localEditTs) {
-                var keepName = userData.profileName;
+              
+              if (cloud && cloudTs > localEditTs) {
+                var keepName = userData ? userData.profileName : "";
                 userData = cloud;
-                userData.profileName = keepName;
+                if(keepName) userData.profileName = keepName;
                 ensure(userData);
                 saveLocal();
                 showApp();
                 toast('Synced latest changes from the cloud.', '');
+              } else if (!userData) {
+                 var local = loadLocal(activeEmail);
+                 if(local) userData = local;
+                 showApp();
               }
             });
-          } else {
-            setSS('guest');
-          }
+        } else if (saved && isGuest(saved)) {
+            // Handle offline guest
+            activeEmail = saved;
+            var local = loadLocal(saved);
+            if (local) {
+                userData = local;
+                ensure(userData);
+                setSS('guest');
+                showApp();
+            } else { showLogin(); }
         } else {
-          showLogin();
+            showLogin();
         }
-      } else {
-        showLogin();
-      }
-
-    })();
+    });
   </script>
 </body>
 </html>
