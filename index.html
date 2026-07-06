@@ -92,6 +92,14 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet" />
   <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    * { -webkit-tap-highlight-color: transparent !important; outline-color: transparent; }
+    button:focus, input:focus, select:focus, textarea:focus { outline: none; }
+    button, input, select, textarea { font: inherit; -webkit-tap-highlight-color: transparent; }
+    button { border: 0; background: none; cursor: pointer; -webkit-appearance: none; }
+    input, select, textarea { color: inherit; -webkit-appearance: none; }
+    html { scroll-behavior: smooth; }
+
     :root {
       --bg: oklch(12% 0.014 265);
       --bg-soft: oklch(16% 0.014 265);
@@ -118,2632 +126,617 @@
       --blue-soft: oklch(28% 0.045 240 / 0.45);
       --blue-border: oklch(52% 0.08 240 / 0.55);
       --shadow-lg: 0 30px 80px oklch(4% 0 0 / 0.42);
-      --shadow-md: 0 16px 38px oklch(4% 0 0 / 0.26);
       --shadow-sm: 0 8px 20px oklch(4% 0 0 / 0.18);
       --glass: blur(20px);
-      --radius-xl: 28px;
-      --radius-lg: 22px;
-      --radius-md: 16px;
-      --radius-sm: 12px;
-      --space-1: 4px;
-      --space-2: 8px;
-      --space-3: 12px;
-      --space-4: 16px;
-      --space-5: 20px;
-      --space-6: 24px;
-      --space-7: 32px;
-      --space-8: 40px;
-      --space-9: 48px;
-      --space-10: 64px;
       --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
-      --ease-in: cubic-bezier(0.7, 0, 0.84, 0);
-      --ease-soft: cubic-bezier(0.16, 1, 0.3, 1);
     }
 
     body[data-theme="light"] {
-      --bg: oklch(97% 0.008 90);
-      --bg-soft: oklch(94% 0.008 90);
-      --surface: oklch(100% 0.004 90 / 0.88);
-      --surface-2: oklch(98% 0.006 90 / 0.94);
-      --surface-3: oklch(95% 0.008 90 / 0.98);
-      --surface-4: oklch(91% 0.01 90);
-      --border: oklch(82% 0.012 90 / 0.56);
-      --border-strong: oklch(66% 0.015 90 / 0.62);
-      --text: oklch(21% 0.012 265);
-      --text-muted: oklch(40% 0.012 265);
-      --text-dim: oklch(56% 0.01 265);
-      --gold: oklch(58% 0.13 82);
-      --gold-2: oklch(52% 0.12 80);
-      --gold-soft: oklch(90% 0.05 82 / 0.75);
-      --gold-border: oklch(66% 0.09 82 / 0.55);
-      --green: oklch(50% 0.12 165);
-      --green-soft: oklch(90% 0.045 165 / 0.7);
-      --green-border: oklch(65% 0.08 165 / 0.5);
-      --red: oklch(53% 0.18 25);
-      --red-soft: oklch(91% 0.05 25 / 0.75);
-      --red-border: oklch(66% 0.09 25 / 0.5);
-      --blue: oklch(55% 0.11 240);
-      --blue-soft: oklch(90% 0.045 240 / 0.7);
-      --blue-border: oklch(65% 0.08 240 / 0.5);
-      --shadow-lg: 0 28px 64px oklch(40% 0.01 265 / 0.16);
-      --shadow-md: 0 14px 28px oklch(40% 0.01 265 / 0.11);
-      --shadow-sm: 0 8px 18px oklch(40% 0.01 265 / 0.08);
+      --bg: oklch(97% 0.008 90); --bg-soft: oklch(94% 0.008 90);
+      --surface: oklch(100% 0.004 90 / 0.88); --surface-2: oklch(98% 0.006 90 / 0.94);
+      --surface-3: oklch(95% 0.008 90 / 0.98); --surface-4: oklch(91% 0.01 90);
+      --border: oklch(82% 0.012 90 / 0.56); --border-strong: oklch(66% 0.015 90 / 0.62);
+      --text: oklch(21% 0.012 265); --text-muted: oklch(40% 0.012 265); --text-dim: oklch(56% 0.01 265);
+      --gold: oklch(58% 0.13 82); --gold-2: oklch(52% 0.12 80);
+      --gold-soft: oklch(90% 0.05 82 / 0.75); --gold-border: oklch(66% 0.09 82 / 0.55);
+      --green: oklch(50% 0.12 165); --green-soft: oklch(90% 0.045 165 / 0.7); --green-border: oklch(65% 0.08 165 / 0.5);
+      --red: oklch(53% 0.18 25); --red-soft: oklch(91% 0.05 25 / 0.75); --red-border: oklch(66% 0.09 25 / 0.5);
+      --blue: oklch(55% 0.11 240); --blue-soft: oklch(90% 0.045 240 / 0.7); --blue-border: oklch(65% 0.08 240 / 0.5);
+      --shadow-lg: 0 28px 64px oklch(40% 0.01 265 / 0.16); --shadow-sm: 0 8px 18px oklch(40% 0.01 265 / 0.08);
     }
 
     body[data-theme="grey"] {
-      --bg: oklch(24% 0.004 260);
-      --bg-soft: oklch(28% 0.005 260);
-      --surface: oklch(31% 0.005 260 / 0.82);
-      --surface-2: oklch(35% 0.005 260 / 0.86);
-      --surface-3: oklch(39% 0.006 260 / 0.9);
-      --surface-4: oklch(44% 0.007 260 / 0.96);
-      --border: oklch(52% 0.006 260 / 0.36);
-      --border-strong: oklch(68% 0.008 260 / 0.5);
-      --text: oklch(94% 0.004 260);
-      --text-muted: oklch(77% 0.006 260);
-      --text-dim: oklch(62% 0.007 260);
+      --bg: oklch(24% 0.004 260); --bg-soft: oklch(28% 0.005 260);
+      --surface: oklch(31% 0.005 260 / 0.82); --surface-2: oklch(35% 0.005 260 / 0.86);
+      --surface-3: oklch(39% 0.006 260 / 0.9); --surface-4: oklch(44% 0.007 260 / 0.96);
+      --border: oklch(52% 0.006 260 / 0.36); --border-strong: oklch(68% 0.008 260 / 0.5);
+      --text: oklch(94% 0.004 260); --text-muted: oklch(77% 0.006 260); --text-dim: oklch(62% 0.007 260);
     }
 
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    *::before, *::after { box-sizing: border-box; }
-    html { scroll-behavior: smooth; }
     body {
-      min-height: 100vh;
-      font-family: Inter, system-ui, sans-serif;
-      background:
-        radial-gradient(circle at top left, oklch(45% 0.05 85 / 0.12), transparent 26%),
-        radial-gradient(circle at bottom right, oklch(46% 0.06 240 / 0.09), transparent 24%),
-        linear-gradient(180deg, var(--bg-soft), var(--bg));
-      color: var(--text);
-      padding: var(--space-8) var(--space-5) 120px;
-      line-height: 1.55;
-      font-optical-sizing: auto;
-      -webkit-font-smoothing: antialiased;
-      position: relative;
-      overflow-x: hidden;
+      min-height: 100vh; font-family: Inter, system-ui, sans-serif;
+      background: linear-gradient(180deg, var(--bg-soft), var(--bg));
+      color: var(--text); padding: 40px 20px 120px; line-height: 1.55;
+      -webkit-font-smoothing: antialiased; font-optical-sizing: auto;
     }
 
-    body::before,
-    body::after {
-      content: "";
-      position: fixed;
-      inset: auto;
-      pointer-events: none;
-      z-index: 0;
-      filter: blur(60px);
-      opacity: 0.55;
+    /* ═══════ LOADING SCREEN ═══════ */
+    .loading-screen {
+      position: fixed; inset: 0; z-index: 9999;
+      background: var(--bg);
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center; gap: 24px;
+      transition: opacity 300ms ease, visibility 300ms ease;
     }
+    .loading-screen.hidden { opacity: 0; visibility: hidden; pointer-events: none; }
+    .loader { width: 40px; height: 40px; border-radius: 50%; border: 3px solid var(--border); border-top-color: var(--gold); animation: spin 0.7s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .loading-text { font: 0.8rem/1 "JetBrains Mono", monospace; color: var(--text-dim); letter-spacing: 0.08em; }
 
-    body::before {
-      width: 340px;
-      height: 340px;
-      top: -70px;
-      right: -120px;
-      background: oklch(50% 0.08 85 / 0.2);
-    }
+    /* ═══════ SHARED ═══════ */
+    .container { max-width: 960px; margin: 0 auto; position: relative; z-index: 1; }
+    .hide { display: none !important; }
 
-    body::after {
-      width: 360px;
-      height: 360px;
-      bottom: -120px;
-      left: -140px;
-      background: oklch(50% 0.06 240 / 0.18);
-    }
-
-    button, input, select, textarea { font: inherit; }
-    button { border: 0; background: none; cursor: pointer; }
-    input, select, textarea { color: inherit; }
-
-    .app-shell,
-    .login-screen,
-    .panel,
-    .mini-card,
-    .insight-card,
-    .history-card,
-    .calendar-day,
-    .modal-card,
-    .toast,
-    .drawer {
-      backdrop-filter: var(--glass);
-      -webkit-backdrop-filter: var(--glass);
-    }
-
-    .app-shell {
-      max-width: 1340px;
-      margin: 0 auto;
-      position: relative;
-      z-index: 1;
-      display: none;
-      grid-template-columns: 1.2fr 0.8fr;
-      gap: var(--space-6);
-      align-items: start;
-    }
-
-    .app-shell.active {
-      display: grid;
-    }
-
-    .login-screen {
-      width: min(100%, 1120px);
-      margin: 0 auto;
-      position: relative;
-      z-index: 1;
-      display: none;
-      grid-template-columns: 1.1fr 0.9fr;
-      gap: var(--space-7);
-      align-items: stretch;
-    }
-
-    .login-screen.active {
-      display: grid;
-    }
-
-    .login-hero,
-    .login-card,
-    .panel,
-    .drawer {
-      background: var(--surface);
-      border: 1px solid var(--border);
+    .panel, .drawer, .login-box {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 24px; padding: 32px;
+      backdrop-filter: var(--glass); -webkit-backdrop-filter: var(--glass);
       box-shadow: var(--shadow-lg);
     }
 
-    .login-hero {
-      border-radius: var(--radius-xl);
-      padding: var(--space-9);
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      min-height: 760px;
-      overflow: hidden;
-      position: relative;
-    }
-
-    .login-hero::before {
-      content: "";
-      position: absolute;
-      inset: 24px 24px auto auto;
-      width: 220px;
-      height: 220px;
-      background: radial-gradient(circle, oklch(76% 0.11 85 / 0.28), transparent 68%);
-      filter: blur(10px);
-    }
-
-    .brand-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: var(--space-4);
-    }
-
-    .brand {
-      display: flex;
-      align-items: center;
-      gap: var(--space-4);
-    }
-
-    .brand-mark {
-      width: 48px;
-      height: 48px;
-      border-radius: 15px;
-      display: grid;
-      place-items: center;
-      background: linear-gradient(135deg, var(--gold), var(--gold-2));
-      color: oklch(18% 0.012 265);
-      font-weight: 900;
-      box-shadow: 0 18px 34px oklch(52% 0.08 85 / 0.32);
-    }
-
-    .brand-name {
-      font-size: 0.95rem;
-      font-weight: 800;
-      letter-spacing: -0.02em;
-    }
-
-    .brand-meta {
-      font: 0.72rem/1.4 "JetBrains Mono", monospace;
-      color: var(--text-dim);
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      margin-top: 2px;
-    }
-
-    .theme-switch {
-      border-radius: 999px;
-      padding: 10px 14px;
-      background: var(--surface-2);
-      border: 1px solid var(--border);
-      color: var(--text-muted);
-      font-weight: 700;
-      transition: transform 180ms var(--ease-out), border-color 180ms ease, background 180ms ease;
-    }
-
-    .theme-switch:hover { transform: translateY(-1px); border-color: var(--border-strong); background: var(--surface-3); color: var(--text); }
-
-    .hero-copy {
-      max-width: 28ch;
-      display: flex;
-      flex-direction: column;
-      gap: var(--space-6);
-    }
-
-    .hero-eyebrow {
-      font: 0.72rem/1.4 "JetBrains Mono", monospace;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-      color: var(--gold);
-    }
-
-    .hero-title {
-      font-size: clamp(2.9rem, 5vw, 5.3rem);
-      line-height: 0.96;
-      letter-spacing: -0.06em;
-      font-weight: 900;
-      text-wrap: balance;
-    }
-
-    .hero-sub {
-      max-width: 48ch;
-      color: var(--text-muted);
-      font-size: 1rem;
-    }
-
-    .hero-grid {
-      display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: var(--space-4);
-      margin-top: auto;
-    }
-
-    .mini-card {
-      background: linear-gradient(180deg, var(--surface-2), var(--surface-3));
-      border: 1px solid var(--border);
-      border-radius: var(--radius-md);
-      padding: var(--space-5);
-      box-shadow: var(--shadow-sm);
-    }
-
-    .mini-card .kicker {
-      font: 0.7rem/1.4 "JetBrains Mono", monospace;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      color: var(--text-dim);
-      margin-bottom: var(--space-3);
-    }
-
-    .mini-card strong {
-      display: block;
-      font-size: 1.25rem;
-      letter-spacing: -0.03em;
-      margin-bottom: var(--space-2);
-    }
-
-    .mini-card p {
-      color: var(--text-muted);
-      font-size: 0.9rem;
-    }
-
-    .login-card {
-      border-radius: var(--radius-xl);
-      padding: var(--space-9);
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      min-height: 760px;
-    }
-
-    .login-card-inner {
-      max-width: 460px;
-      margin: 0 auto;
-      width: 100%;
-    }
-
-    .login-title {
-      font-size: clamp(2rem, 3.2vw, 3.1rem);
-      letter-spacing: -0.05em;
-      line-height: 1;
-      font-weight: 900;
-      margin-bottom: var(--space-3);
-    }
-
-    .login-sub {
-      color: var(--text-muted);
-      margin-bottom: var(--space-7);
-      max-width: 38ch;
-    }
-
-    .status {
-      display: none;
-      padding: 12px 14px;
-      border-radius: var(--radius-sm);
-      font: 0.76rem/1.5 "JetBrains Mono", monospace;
-      margin-bottom: var(--space-5);
-      border: 1px solid transparent;
-    }
-
+    .status { display: none; padding: 12px 14px; border-radius: 12px; font: 0.76rem/1.5 "JetBrains Mono", monospace; margin-bottom: 20px; border: 1px solid transparent; }
     .status.show { display: block; }
     .status.error { background: var(--red-soft); color: var(--red); border-color: var(--red-border); }
     .status.success { background: var(--green-soft); color: var(--green); border-color: var(--green-border); }
     .status.info { background: var(--blue-soft); color: var(--blue); border-color: var(--blue-border); }
 
-    .field {
-      margin-bottom: var(--space-5);
-    }
-
-    .field-top {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: var(--space-2);
-      gap: var(--space-3);
-    }
-
-    .label {
-      font: 0.72rem/1.4 "JetBrains Mono", monospace;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      color: var(--text-muted);
-    }
-
-    .hint {
-      font-size: 0.75rem;
-      color: var(--text-dim);
-    }
-
-    .input,
-    .select,
-    .textarea {
-      width: 100%;
-      border-radius: 14px;
-      border: 1px solid var(--border);
-      background: linear-gradient(180deg, var(--surface-2), var(--surface-3));
-      padding: 14px 16px;
-      outline: none;
-      transition: border-color 180ms ease, background 180ms ease, transform 180ms var(--ease-out), box-shadow 180ms ease;
-      color: var(--text);
-    }
-
-    .input::placeholder,
-    .textarea::placeholder { color: var(--text-dim); }
-    .input:focus,
-    .select:focus,
-    .textarea:focus {
-      border-color: var(--gold-border);
-      background: var(--surface-2);
-      box-shadow: 0 0 0 4px var(--gold-soft);
-      transform: translateY(-1px);
-    }
-
-    .password-wrap {
-      position: relative;
-    }
-
-    .password-toggle {
-      position: absolute;
-      right: 12px;
-      top: 50%;
-      transform: translateY(-50%);
-      border-radius: 999px;
-      padding: 6px 10px;
-      background: var(--surface-4);
-      border: 1px solid var(--border);
-      color: var(--text-muted);
-      font: 0.72rem/1 "JetBrains Mono", monospace;
-    }
-
-    .password-toggle:hover { color: var(--text); border-color: var(--border-strong); }
-
-    .button-row {
-      display: flex;
-      gap: var(--space-3);
-      flex-wrap: wrap;
-      margin-top: var(--space-6);
-    }
-
-    .btn {
-      border-radius: 999px;
-      padding: 14px 18px;
-      font-weight: 800;
-      transition: transform 180ms var(--ease-out), box-shadow 180ms ease, background 180ms ease, border-color 180ms ease, color 180ms ease;
-      white-space: nowrap;
-    }
-
-    .btn-primary {
-      background: linear-gradient(135deg, var(--gold), var(--gold-2));
-      color: oklch(18% 0.012 265);
-      box-shadow: 0 16px 30px oklch(55% 0.08 85 / 0.28);
-    }
-
-    .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 22px 36px oklch(55% 0.08 85 / 0.34); }
-    .btn-secondary {
-      background: var(--surface-2);
-      color: var(--text-muted);
-      border: 1px solid var(--border);
-    }
-    .btn-secondary:hover,
-    .ghost-btn:hover,
-    .pill:hover,
-    .tool-btn:hover,
-    .tag:hover { transform: translateY(-1px); border-color: var(--border-strong); color: var(--text); background: var(--surface-3); }
-
-    .auth-foot {
-      margin-top: var(--space-6);
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: var(--space-4);
-      flex-wrap: wrap;
-      color: var(--text-dim);
-      font-size: 0.86rem;
-    }
-
-    .auth-pill-row {
-      display: flex;
-      gap: var(--space-2);
-      flex-wrap: wrap;
-      margin-top: var(--space-5);
-    }
-
-    .pill,
-    .tool-btn,
-    .tag,
-    .ghost-btn {
-      border-radius: 999px;
-      border: 1px solid var(--border);
-      background: var(--surface-2);
-      color: var(--text-muted);
-      padding: 9px 12px;
-      font-weight: 700;
-      font-size: 0.78rem;
-      transition: transform 180ms var(--ease-out), border-color 180ms ease, background 180ms ease, color 180ms ease;
-    }
-
-    .pill.active,
-    .tool-btn.active,
-    .tag.active {
-      background: var(--gold-soft);
-      border-color: var(--gold-border);
-      color: var(--gold);
-    }
-
-    .workspace {
-      display: grid;
-      gap: var(--space-6);
-    }
-
-    .topbar {
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
-      gap: var(--space-4);
-      margin-bottom: var(--space-2);
-    }
-
-    .topbar-left {
-      display: flex;
-      flex-direction: column;
-      gap: var(--space-3);
-    }
-
-    .eyebrow {
-      font: 0.72rem/1.4 "JetBrains Mono", monospace;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-      color: var(--gold);
-    }
-
-    .headline {
-      font-size: clamp(2rem, 3vw, 3.4rem);
-      line-height: 0.96;
-      letter-spacing: -0.05em;
-      font-weight: 900;
-      text-wrap: balance;
-      max-width: 12ch;
-    }
-
-    .subline {
-      color: var(--text-muted);
-      max-width: 55ch;
-    }
-
-    .topbar-actions {
-      display: flex;
-      align-items: center;
-      gap: var(--space-3);
-      flex-wrap: wrap;
-      justify-content: flex-end;
-    }
-
-    .sync-chip,
-    .user-chip {
-      border-radius: 999px;
-      padding: 10px 14px;
-      font: 0.74rem/1 "JetBrains Mono", monospace;
-      border: 1px solid var(--border);
-      background: var(--surface-2);
-      color: var(--text-muted);
-    }
-
-    .sync-chip.good { color: var(--green); background: var(--green-soft); border-color: var(--green-border); }
-    .sync-chip.warn { color: var(--gold); background: var(--gold-soft); border-color: var(--gold-border); }
-    .sync-chip.bad { color: var(--red); background: var(--red-soft); border-color: var(--red-border); }
-
-    .panel {
-      border-radius: var(--radius-xl);
-      padding: var(--space-7);
-      position: relative;
-      overflow: hidden;
-    }
-
-    .panel-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
-      gap: var(--space-4);
-      margin-bottom: var(--space-6);
-      flex-wrap: wrap;
-    }
-
-    .panel-title {
-      font-size: 1.45rem;
-      font-weight: 900;
-      letter-spacing: -0.04em;
-      margin-bottom: 6px;
-    }
-
-    .panel-subtitle {
-      color: var(--text-muted);
-      max-width: 58ch;
-      font-size: 0.92rem;
-    }
-
-    .hero-metrics-nope { display: none; }
-
-    .toolbar {
-      display: grid;
-      grid-template-columns: 1.1fr auto;
-      gap: var(--space-5);
-      align-items: start;
-      margin-bottom: var(--space-6);
-    }
-
-    .habit-editor {
-      display: grid;
-      gap: var(--space-4);
-    }
-
-    .habit-input {
-      width: 100%;
-      border: 0;
-      background: transparent;
-      color: var(--text);
-      font-size: clamp(1.6rem, 2.6vw, 2.6rem);
-      font-weight: 900;
-      letter-spacing: -0.05em;
-      outline: none;
-      padding: 0;
-    }
-
-    .habit-input::placeholder { color: var(--text-dim); }
-
-    .meta-row {
-      display: flex;
-      gap: var(--space-3);
-      flex-wrap: wrap;
-      align-items: center;
-    }
-
-    .meta-chip {
-      border-radius: 999px;
-      padding: 8px 12px;
-      font: 0.72rem/1 "JetBrains Mono", monospace;
-      background: var(--surface-2);
-      border: 1px solid var(--border);
-      color: var(--text-muted);
-    }
-
-    .meta-chip.gold { background: var(--gold-soft); border-color: var(--gold-border); color: var(--gold); }
-    .meta-chip.green { background: var(--green-soft); border-color: var(--green-border); color: var(--green); }
-    .meta-chip.blue { background: var(--blue-soft); border-color: var(--blue-border); color: var(--blue); }
-
-    .control-stack {
-      display: grid;
-      gap: var(--space-3);
-      justify-items: end;
-    }
-
-    .segment {
-      display: flex;
-      gap: var(--space-2);
-      flex-wrap: wrap;
-      justify-content: flex-end;
-    }
-
-    .stat-grid {
-      display: grid;
-      grid-template-columns: repeat(4, minmax(0, 1fr));
-      gap: var(--space-4);
-      margin-bottom: var(--space-6);
-    }
-
-    .insight-card {
-      background: linear-gradient(180deg, var(--surface-2), var(--surface-3));
-      border: 1px solid var(--border);
-      border-radius: var(--radius-md);
-      padding: var(--space-5);
-      min-height: 128px;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      box-shadow: var(--shadow-sm);
-      transition: transform 180ms var(--ease-out), border-color 180ms ease;
-    }
-
-    .insight-card:hover { transform: translateY(-2px); border-color: var(--border-strong); }
-    .insight-label { font: 0.72rem/1.4 "JetBrains Mono", monospace; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-dim); }
-    .insight-value { font-size: clamp(1.7rem, 2vw, 2.3rem); font-weight: 900; letter-spacing: -0.05em; font-variant-numeric: tabular-nums; }
-    .insight-value.green { color: var(--green); }
-    .insight-value.red { color: var(--red); }
-    .insight-value.gold { color: var(--gold); }
-    .insight-value.blue { color: var(--blue); }
-    .insight-note { color: var(--text-muted); font-size: 0.84rem; }
-
-    .completion-strip {
-      display: grid;
-      gap: var(--space-3);
-      margin-bottom: var(--space-6);
-    }
-
-    .bar {
-      width: 100%;
-      height: 12px;
-      border-radius: 999px;
-      background: var(--surface-3);
-      overflow: hidden;
-      border: 1px solid var(--border);
-    }
-
-    .bar-fill {
-      height: 100%;
-      width: 0%;
-      border-radius: 999px;
-      background: linear-gradient(90deg, var(--green), var(--gold));
-      transition: width 400ms var(--ease-out), background 250ms ease;
-    }
-
-    .bar-caption {
-      display: flex;
-      justify-content: space-between;
-      gap: var(--space-3);
-      flex-wrap: wrap;
-      color: var(--text-muted);
-      font-size: 0.84rem;
-    }
-
-    .calendar-shell {
-      display: grid;
-      gap: var(--space-4);
-    }
-
-    .calendar-header {
-      display: grid;
-      grid-template-columns: repeat(7, minmax(0, 1fr));
-      gap: var(--space-3);
-    }
-
-    .calendar-header span {
-      font: 0.68rem/1.4 "JetBrains Mono", monospace;
-      text-transform: uppercase;
-      letter-spacing: 0.1em;
-      color: var(--text-dim);
-      padding-left: 4px;
-    }
-
-    .calendar-grid {
-      display: grid;
-      grid-template-columns: repeat(7, minmax(0, 1fr));
-      gap: var(--space-3);
-    }
-
-    .calendar-day {
-      background: linear-gradient(180deg, var(--surface-2), var(--surface-3));
-      border: 1px solid var(--border);
-      border-radius: 18px;
-      min-height: 150px;
-      padding: var(--space-4);
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      position: relative;
-      overflow: hidden;
-      box-shadow: var(--shadow-sm);
-      transition: transform 180ms var(--ease-out), border-color 180ms ease, background 180ms ease, opacity 180ms ease;
-    }
-
-    .calendar-day:hover { transform: translateY(-2px); border-color: var(--border-strong); }
-    .calendar-day.checked { background: linear-gradient(180deg, var(--green-soft), var(--surface-3)); border-color: var(--green-border); }
-    .calendar-day.crossed { background: linear-gradient(180deg, var(--red-soft), var(--surface-3)); border-color: var(--red-border); }
-    .calendar-day.streak { box-shadow: var(--shadow-sm), 0 0 0 1px var(--gold-border), 0 0 24px oklch(65% 0.08 85 / 0.18); }
-    .calendar-day.expired { opacity: 0.45; }
-    .calendar-day.today::after {
-      content: "TODAY";
-      position: absolute;
-      top: 12px;
-      left: 12px;
-      font: 0.62rem/1 "JetBrains Mono", monospace;
-      color: var(--blue);
-      background: var(--blue-soft);
-      border: 1px solid var(--blue-border);
-      padding: 4px 6px;
-      border-radius: 999px;
-      letter-spacing: 0.08em;
-    }
-
-    .day-top {
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
-      gap: var(--space-3);
-      padding-top: 18px;
-    }
-
-    .day-week {
-      font: 0.68rem/1.4 "JetBrains Mono", monospace;
-      letter-spacing: 0.1em;
-      color: var(--text-dim);
-      text-transform: uppercase;
-    }
-
-    .day-number {
-      font-size: 1.8rem;
-      font-weight: 900;
-      letter-spacing: -0.05em;
-      line-height: 1;
-    }
-
-    .countdown {
-      border-radius: 999px;
-      padding: 5px 8px;
-      font: 0.62rem/1 "JetBrains Mono", monospace;
-      background: var(--gold-soft);
-      border: 1px solid var(--gold-border);
-      color: var(--gold);
-      white-space: nowrap;
-    }
-
-    .countdown.urgent { color: var(--red); background: var(--red-soft); border-color: var(--red-border); }
-    .countdown.info { color: var(--blue); background: var(--blue-soft); border-color: var(--blue-border); }
-
-    .day-bottom {
-      display: grid;
-      gap: var(--space-3);
-    }
-
-    .day-state {
-      font-size: 0.82rem;
-      color: var(--text-muted);
-    }
-
-    .day-actions {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: var(--space-2);
-    }
-
-    .state-btn {
-      border-radius: 12px;
-      padding: 10px 12px;
-      border: 1px solid var(--border);
-      background: var(--surface-4);
-      color: var(--text-muted);
-      font-weight: 800;
-      transition: transform 160ms var(--ease-out), border-color 160ms ease, background 160ms ease, color 160ms ease;
-    }
-
-    .state-btn:hover { transform: scale(1.03); border-color: var(--border-strong); color: var(--text); }
-    .state-btn.check.active { background: var(--green); border-color: var(--green); color: white; }
-    .state-btn.cross.active { background: var(--red); border-color: var(--red); color: white; }
-
-    .side-column {
-      display: grid;
-      gap: var(--space-6);
-      position: sticky;
-      top: 24px;
-    }
-
-    .drawer {
-      border-radius: var(--radius-xl);
-      padding: var(--space-6);
-    }
-
-    .drawer-section + .drawer-section {
-      margin-top: var(--space-6);
-      padding-top: var(--space-6);
-      border-top: 1px solid var(--border);
-    }
-
-    .drawer-title {
-      font-size: 1.05rem;
-      font-weight: 900;
-      letter-spacing: -0.03em;
-      margin-bottom: var(--space-2);
-    }
-
-    .drawer-copy {
-      color: var(--text-muted);
-      font-size: 0.88rem;
-      margin-bottom: var(--space-4);
-    }
-
-    .field-grid {
-      display: grid;
-      gap: var(--space-4);
-    }
-
-    .split {
-      display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: var(--space-3);
-    }
-
-    .history-list,
-    .timeline,
-    .streak-list {
-      display: grid;
-      gap: var(--space-3);
-    }
-
-    .history-card {
-      background: linear-gradient(180deg, var(--surface-2), var(--surface-3));
-      border: 1px solid var(--border);
-      border-radius: 18px;
-      padding: var(--space-5);
-      display: grid;
-      gap: var(--space-4);
-      box-shadow: var(--shadow-sm);
-      transition: transform 180ms var(--ease-out), border-color 180ms ease;
-    }
-
-    .history-card:hover { transform: translateX(3px); border-color: var(--border-strong); }
-    .history-top { display: flex; justify-content: space-between; gap: var(--space-4); align-items: flex-start; }
-    .history-name { font-size: 1rem; font-weight: 800; letter-spacing: -0.03em; }
-    .history-period { color: var(--text-muted); font-size: 0.82rem; }
-    .history-stats { display: flex; gap: var(--space-3); flex-wrap: wrap; }
-    .history-stat { font: 0.72rem/1 "JetBrains Mono", monospace; padding: 8px 10px; border-radius: 999px; border: 1px solid var(--border); background: var(--surface-4); color: var(--text-muted); }
-    .history-stat.green { color: var(--green); border-color: var(--green-border); background: var(--green-soft); }
-    .history-stat.red { color: var(--red); border-color: var(--red-border); background: var(--red-soft); }
-    .history-stat.gold { color: var(--gold); border-color: var(--gold-border); background: var(--gold-soft); }
-    .history-actions { display: flex; gap: var(--space-2); flex-wrap: wrap; }
-
-    .empty {
-      padding: var(--space-7);
-      border-radius: 18px;
-      border: 1px dashed var(--border-strong);
-      color: var(--text-dim);
-      font: 0.8rem/1.6 "JetBrains Mono", monospace;
-      text-align: center;
-      background: var(--surface-2);
-    }
-
-    .toast {
-      position: fixed;
-      left: 50%;
-      bottom: 28px;
-      transform: translateX(-50%) translateY(120px);
-      z-index: 2000;
-      background: var(--surface);
-      border: 1px solid var(--border-strong);
-      border-radius: 18px;
-      padding: 14px 18px;
-      box-shadow: var(--shadow-lg);
-      min-width: 280px;
-      max-width: min(92vw, 560px);
-      opacity: 0;
-      pointer-events: none;
-      transition: transform 250ms var(--ease-out), opacity 250ms ease;
-      font-weight: 700;
-    }
-
+    .field { margin-bottom: 20px; }
+    .label { font: 0.72rem/1.4 "JetBrains Mono", monospace; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-muted); margin-bottom: 6px; display: block; }
+    .input, .select, .textarea { width: 100%; border-radius: 14px; border: 1px solid var(--border); background: var(--surface-2); padding: 14px 16px; color: var(--text); transition: border-color 180ms ease, box-shadow 180ms ease; }
+    .input::placeholder, .textarea::placeholder { color: var(--text-dim); }
+    .input:focus, .select:focus, .textarea:focus { border-color: var(--gold-border); box-shadow: 0 0 0 3px var(--gold-soft); }
+
+    .btn { border-radius: 999px; padding: 14px 20px; font-weight: 800; white-space: nowrap; transition: transform 150ms var(--ease-out), box-shadow 150ms ease, opacity 150ms ease; display: inline-flex; align-items: center; justify-content: center; gap: 8px; }
+    .btn:active { transform: scale(0.97); }
+    .btn-primary { background: linear-gradient(135deg, var(--gold), var(--gold-2)); color: oklch(18% 0.012 265); box-shadow: 0 12px 24px oklch(55% 0.08 85 / 0.25); }
+    .btn-primary:hover { box-shadow: 0 16px 30px oklch(55% 0.08 85 / 0.3); }
+    .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+    .btn-secondary { background: var(--surface-2); color: var(--text-muted); border: 1px solid var(--border); }
+    .btn-secondary:hover { border-color: var(--border-strong); color: var(--text); }
+    .btn-full { width: 100%; }
+    .btn-row { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 24px; }
+
+    .pill, .ghost-btn, .tool-btn, .tag { border-radius: 999px; border: 1px solid var(--border); background: var(--surface-2); color: var(--text-muted); padding: 9px 12px; font-weight: 700; font-size: 0.78rem; transition: transform 150ms var(--ease-out), border-color 150ms ease, background 150ms ease, color 150ms ease; }
+    .pill:active, .ghost-btn:active, .tool-btn:active, .tag:active { transform: scale(0.96); }
+    .pill.active, .tool-btn.active, .tag.active { background: var(--gold-soft); border-color: var(--gold-border); color: var(--gold); }
+
+    .toast { position: fixed; left: 50%; bottom: 28px; transform: translateX(-50%) translateY(120px); z-index: 2000; background: var(--surface); border: 1px solid var(--border-strong); border-radius: 18px; padding: 14px 20px; box-shadow: var(--shadow-lg); min-width: 260px; max-width: min(92vw, 500px); opacity: 0; pointer-events: none; transition: transform 250ms var(--ease-out), opacity 250ms ease; font-weight: 700; text-align: center; backdrop-filter: var(--glass); -webkit-backdrop-filter: var(--glass); }
     .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
     .toast.success { color: var(--green); border-color: var(--green-border); }
     .toast.error { color: var(--red); border-color: var(--red-border); }
     .toast.info { color: var(--blue); border-color: var(--blue-border); }
 
-    .modal {
-      position: fixed;
-      inset: 0;
-      display: none;
-      align-items: center;
-      justify-content: center;
-      padding: var(--space-5);
-      background: oklch(6% 0.01 265 / 0.68);
-      z-index: 1200;
-    }
-
-    .modal.active { display: flex; }
-
-    .modal-card {
-      width: min(96vw, 980px);
-      background: var(--surface);
-      border: 1px solid var(--border-strong);
-      border-radius: 26px;
-      box-shadow: var(--shadow-lg);
-      padding: var(--space-7);
-      max-height: 88vh;
-      overflow: auto;
-    }
-
-    .modal-head {
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
-      gap: var(--space-4);
-      margin-bottom: var(--space-5);
-    }
-
-    .modal-title { font-size: 1.4rem; font-weight: 900; letter-spacing: -0.04em; }
-    .modal-copy { color: var(--text-muted); max-width: 48ch; }
-
-    .record-grid {
-      display: grid;
-      grid-template-columns: repeat(7, minmax(0, 1fr));
-      gap: var(--space-3);
-      margin-top: var(--space-5);
-    }
-
-    .record-box {
-      min-height: 92px;
-      border-radius: 16px;
-      border: 1px solid var(--border);
-      background: var(--surface-2);
-      display: grid;
-      place-items: center;
-      gap: 6px;
-      padding: var(--space-4);
-      text-align: center;
-    }
-
-    .record-box.checked { background: var(--green-soft); border-color: var(--green-border); }
-    .record-box.crossed { background: var(--red-soft); border-color: var(--red-border); }
-
-    .feedback-area { min-height: 130px; resize: vertical; }
-
-    .timeline-item,
-    .streak-item {
-      display: flex;
-      justify-content: space-between;
-      gap: var(--space-3);
-      align-items: center;
-      padding: var(--space-4);
-      border-radius: 16px;
-      background: var(--surface-2);
-      border: 1px solid var(--border);
-    }
-
-    .timeline-item strong,
-    .streak-item strong { font-size: 0.92rem; }
-    .timeline-item span,
-    .streak-item span { color: var(--text-muted); font-size: 0.8rem; }
-
-    .analytics-grid {
-      display: grid;
-      gap: var(--space-4);
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
-
-    .tiny-chart {
-      height: 110px;
-      display: flex;
-      gap: 8px;
-      align-items: end;
-    }
-
-    .tiny-chart span {
-      flex: 1;
-      border-radius: 999px 999px 8px 8px;
-      background: linear-gradient(180deg, var(--gold), var(--gold-2));
-      min-height: 18px;
-      opacity: 0.8;
-    }
-
-    .login-mode {
-      display: inline-flex;
-      gap: 8px;
-      flex-wrap: wrap;
-      margin-bottom: var(--space-6);
-    }
-
-    .mode-btn {
-      border-radius: 999px;
-      padding: 10px 12px;
-      border: 1px solid var(--border);
-      background: var(--surface-2);
-      color: var(--text-muted);
-      font-weight: 800;
-      transition: all 180ms var(--ease-out);
-    }
-
+    /* ═══════ LOGIN ═══════ */
+    .login-wrap { display: none; flex-direction: column; align-items: center; justify-content: center; min-height: 80vh; }
+    .login-wrap.active { display: flex; }
+    .login-box { width: 100%; max-width: 440px; }
+    .login-title { font-size: 2rem; font-weight: 900; letter-spacing: -0.04em; margin-bottom: 8px; }
+    .login-sub { color: var(--text-muted); margin-bottom: 28px; }
+    .mode-row { display: flex; gap: 8px; margin-bottom: 24px; flex-wrap: wrap; }
+    .mode-btn { border-radius: 999px; padding: 10px 14px; border: 1px solid var(--border); background: var(--surface-2); color: var(--text-muted); font-weight: 800; font-size: 0.82rem; transition: all 150ms var(--ease-out); }
+    .mode-btn:active { transform: scale(0.96); }
     .mode-btn.active { background: var(--gold-soft); border-color: var(--gold-border); color: var(--gold); }
+    .password-wrap { position: relative; }
+    .pw-toggle { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); border-radius: 999px; padding: 6px 10px; background: var(--surface-4); border: 1px solid var(--border); color: var(--text-muted); font: 0.72rem/1 "JetBrains Mono", monospace; }
+    .divider { display: flex; align-items: center; gap: 12px; margin: 20px 0; font-size: 0.72rem; color: var(--text-dim); font-weight: 600; font-family: "JetBrains Mono", monospace; }
+    .divider::before, .divider::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+    .auth-loading { display: none; align-items: center; justify-content: center; gap: 12px; padding: 14px; }
+    .auth-loading.show { display: flex; }
+    .auth-loading .loader { width: 22px; height: 22px; border-width: 2px; }
+    .auth-loading span { font: 0.78rem/1 "JetBrains Mono", monospace; color: var(--text-dim); }
 
-    .footer-note {
-      margin-top: var(--space-6);
-      color: var(--text-dim);
-      font-size: 0.82rem;
-    }
+    /* ═══════ APP ═══════ */
+    .app-wrap { display: none; flex-direction: column; gap: 24px; }
+    .app-wrap.active { display: flex; }
+    .topbar { display: flex; justify-content: space-between; align-items: center; gap: 16px; flex-wrap: wrap; margin-bottom: 8px; }
+    .topbar-left { display: flex; align-items: center; gap: 12px; }
+    .topbar-brand { font-weight: 900; font-size: 1.1rem; letter-spacing: -0.03em; }
+    .topbar-right { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+    .sync-chip { border-radius: 999px; padding: 8px 12px; font: 0.72rem/1 "JetBrains Mono", monospace; border: 1px solid var(--border); background: var(--surface-2); color: var(--text-muted); }
+    .sync-chip.good { color: var(--green); background: var(--green-soft); border-color: var(--green-border); }
+    .sync-chip.bad { color: var(--red); background: var(--red-soft); border-color: var(--red-border); }
 
-    @media (max-width: 1180px) {
-      .app-shell { grid-template-columns: 1fr; }
-      .side-column { position: static; }
-      .login-screen { grid-template-columns: 1fr; }
-      .login-hero, .login-card { min-height: auto; }
-    }
+    .panel-title { font-size: 1.3rem; font-weight: 900; letter-spacing: -0.04em; margin-bottom: 6px; }
+    .panel-sub { color: var(--text-muted); font-size: 0.9rem; margin-bottom: 24px; }
 
-    @media (max-width: 900px) {
-      .toolbar,
-      .analytics-grid,
-      .stat-grid,
-      .split { grid-template-columns: 1fr; }
-      .calendar-header,
-      .calendar-grid,
-      .record-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
-    }
+    .habit-input { width: 100%; border: 0; background: transparent; color: var(--text); font-size: 1.8rem; font-weight: 900; letter-spacing: -0.05em; outline: none; padding: 0; margin-bottom: 12px; }
+    .habit-input::placeholder { color: var(--text-dim); }
 
-    @media (max-width: 640px) {
-      body { padding: var(--space-5) var(--space-3) 110px; }
-      .panel, .drawer, .login-card, .login-hero { padding: var(--space-5); border-radius: 22px; }
-      .calendar-header,
-      .calendar-grid,
-      .record-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--space-2); }
-      .calendar-day { min-height: 136px; padding: var(--space-3); }
-      .topbar { flex-direction: column; }
-      .topbar-actions, .segment, .control-stack { justify-content: flex-start; }
-      .button-row { flex-direction: column; }
-      .btn { width: 100%; justify-content: center; }
-      .auth-foot { flex-direction: column; align-items: flex-start; }
-      .hero-grid { grid-template-columns: 1fr; }
-    }
+    .meta-row { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; margin-bottom: 24px; }
+    .meta-chip { border-radius: 999px; padding: 7px 11px; font: 0.72rem/1 "JetBrains Mono", monospace; background: var(--surface-2); border: 1px solid var(--border); color: var(--text-muted); }
+    .meta-chip.gold { background: var(--gold-soft); border-color: var(--gold-border); color: var(--gold); }
+    .meta-chip.green { background: var(--green-soft); border-color: var(--green-border); color: var(--green); }
+    .meta-chip.blue { background: var(--blue-soft); border-color: var(--blue-border); color: var(--blue); }
+
+    .stat-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 24px; }
+    .stat-card { background: var(--surface-2); border: 1px solid var(--border); border-radius: 16px; padding: 16px; text-align: center; }
+    .stat-val { font-size: 1.6rem; font-weight: 900; font-variant-numeric: tabular-nums; }
+    .stat-val.green { color: var(--green); } .stat-val.red { color: var(--red); } .stat-val.gold { color: var(--gold); } .stat-val.blue { color: var(--blue); }
+    .stat-lbl { font: 0.68rem/1.4 "JetBrains Mono", monospace; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.08em; margin-top: 4px; }
+
+    .bar { width: 100%; height: 10px; border-radius: 999px; background: var(--surface-3); overflow: hidden; border: 1px solid var(--border); margin-bottom: 24px; }
+    .bar-fill { height: 100%; width: 0%; border-radius: 999px; background: linear-gradient(90deg, var(--green), var(--gold)); transition: width 400ms var(--ease-out); }
+
+    .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 10px; }
+    .cal-day { background: var(--surface-2); border: 1px solid var(--border); border-radius: 16px; min-height: 130px; padding: 12px; display: flex; flex-direction: column; justify-content: space-between; position: relative; transition: transform 150ms var(--ease-out), border-color 150ms ease; }
+    .cal-day:hover { transform: translateY(-2px); border-color: var(--border-strong); }
+    .cal-day.checked { background: var(--green-soft); border-color: var(--green-border); }
+    .cal-day.crossed { background: var(--red-soft); border-color: var(--red-border); }
+    .cal-day.streak { box-shadow: 0 0 0 1px var(--gold-border), 0 0 20px oklch(65% 0.08 85 / 0.15); }
+    .cal-day.today::after { content: "TODAY"; position: absolute; top: 8px; left: 8px; font: 0.58rem/1 "JetBrains Mono", monospace; color: var(--blue); background: var(--blue-soft); border: 1px solid var(--blue-border); padding: 3px 5px; border-radius: 999px; letter-spacing: 0.06em; }
+    .day-num { font-size: 1.5rem; font-weight: 900; line-height: 1; margin-top: 16px; }
+    .day-week { font: 0.62rem/1 "JetBrains Mono", monospace; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.08em; }
+    .day-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-top: auto; }
+    .mark-btn { border-radius: 10px; padding: 8px; border: 1px solid var(--border); background: var(--surface-3); color: var(--text-muted); font-weight: 800; font-size: 0.9rem; transition: transform 120ms var(--ease-out), background 120ms ease, border-color 120ms ease, color 120ms ease; }
+    .mark-btn:active { transform: scale(0.93); }
+    .mark-btn.check.on { background: var(--green); border-color: var(--green); color: white; }
+    .mark-btn.cross.on { background: var(--red); border-color: var(--red); color: white; }
+
+    .history-card { background: var(--surface-2); border: 1px solid var(--border); border-radius: 16px; padding: 16px; margin-bottom: 12px; }
+    .history-card .h-name { font-weight: 800; margin-bottom: 4px; }
+    .history-card .h-period { color: var(--text-muted); font-size: 0.82rem; margin-bottom: 8px; }
+    .history-card .h-stats { display: flex; gap: 8px; flex-wrap: wrap; }
+    .h-stat { font: 0.72rem/1 "JetBrains Mono", monospace; padding: 6px 9px; border-radius: 999px; border: 1px solid var(--border); background: var(--surface-3); color: var(--text-muted); }
+    .h-stat.green { color: var(--green); border-color: var(--green-border); background: var(--green-soft); }
+    .h-stat.red { color: var(--red); border-color: var(--red-border); background: var(--red-soft); }
+    .h-actions { display: flex; gap: 6px; margin-top: 10px; }
+
+    .empty { padding: 32px; border-radius: 16px; border: 1px dashed var(--border-strong); color: var(--text-dim); font: 0.8rem/1.6 "JetBrains Mono", monospace; text-align: center; background: var(--surface-2); }
+
+    .modal { position: fixed; inset: 0; display: none; align-items: center; justify-content: center; padding: 20px; background: oklch(6% 0.01 265 / 0.7); z-index: 1200; }
+    .modal.active { display: flex; }
+    .modal-card { width: min(96vw, 700px); background: var(--surface); border: 1px solid var(--border-strong); border-radius: 24px; box-shadow: var(--shadow-lg); padding: 32px; max-height: 88vh; overflow: auto; backdrop-filter: var(--glass); -webkit-backdrop-filter: var(--glass); }
+    .modal-title { font-size: 1.3rem; font-weight: 900; letter-spacing: -0.04em; margin-bottom: 8px; }
+    .modal-copy { color: var(--text-muted); margin-bottom: 20px; }
+
+    .tools-row { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 20px; }
+    .timer-presets { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 16px; }
+    .split { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+    @media (max-width: 768px) { .stat-grid, .calendar-grid { grid-template-columns: repeat(3, 1fr); } .split { grid-template-columns: 1fr; } .topbar { flex-direction: column; align-items: flex-start; } }
+    @media (max-width: 480px) { body { padding: 20px 12px 100px; } .panel, .drawer, .login-box, .modal-card { padding: 20px; border-radius: 20px; } .calendar-grid { grid-template-columns: repeat(3, 1fr); gap: 8px; } .cal-day { min-height: 110px; padding: 10px; } .btn-row { flex-direction: column; } .btn-full-mobile { width: 100%; } }
   </style>
 </head>
 <body>
+  <div id="loadingScreen" class="loading-screen">
+    <div class="loader"></div>
+    <div class="loading-text">loading your data...</div>
+  </div>
+
   <div id="toast" class="toast"></div>
 
-  <section id="loginScreen" class="login-screen active">
-    <article class="login-hero">
-      <div>
-        <div class="brand-row">
-          <div class="brand">
-            <div class="brand-mark">◆</div>
-            <div>
-              <div class="brand-name">Days Tracking Pro</div>
-              <div class="brand-meta">cloud sync, streak logic, smarter controls</div>
-            </div>
-          </div>
-          <button id="themeToggleLogin" class="theme-switch" type="button">☀ Light</button>
-        </div>
+  <div class="container">
+    <!-- LOGIN -->
+    <section id="loginWrap" class="login-wrap">
+      <div class="login-box">
+        <h1 class="login-title">Days Tracking Pro</h1>
+        <p class="login-sub">Track habits with cloud sync. Sign in to your account, create a new one, or jump in as guest.</p>
 
-        <div class="hero-copy" style="margin-top:48px;">
-          <div class="hero-eyebrow">habit operating system</div>
-          <h1 class="hero-title">track your days without the app feeling dumb</h1>
-          <p class="hero-sub">This rebuild cleans up the auth flow, fixes the missing required-info message, tightens the sync logic, and gives you a much better dashboard instead of the old basic slab.</p>
-        </div>
-      </div>
-
-      <div class="hero-grid">
-        <div class="mini-card">
-          <div class="kicker">why this build</div>
-          <strong>cleaner auth</strong>
-          <p>login, signup, guest mode, show password, better validation, less weirdness.</p>
-        </div>
-        <div class="mini-card">
-          <div class="kicker">sync</div>
-          <strong>firebase first</strong>
-          <p>auth and firestore stay wired in, local cache still covers offline and guest mode.</p>
-        </div>
-        <div class="mini-card">
-          <div class="kicker">tracking</div>
-          <strong>more control</strong>
-          <p>date range tools, timer presets, custom timer parsing, progress, streak insights.</p>
-        </div>
-        <div class="mini-card">
-          <div class="kicker">quality</div>
-          <strong>less jank</strong>
-          <p>stronger states, better empty screens, clearer history, fewer brittle UI moments.</p>
-        </div>
-      </div>
-    </article>
-
-    <article class="login-card">
-      <div class="login-card-inner">
-        <div class="login-mode">
+        <div class="mode-row">
           <button class="mode-btn active" data-mode="signin" type="button">sign in</button>
           <button class="mode-btn" data-mode="signup" type="button">sign up</button>
           <button class="mode-btn" data-mode="guest" type="button">guest</button>
         </div>
 
-        <h2 id="loginTitle" class="login-title">Welcome back</h2>
-        <p id="loginSub" class="login-sub">Use your name, email, and password to enter your synced tracker. Guest mode skips sync.</p>
-
         <div id="loginStatus" class="status"></div>
+        <div id="authLoading" class="auth-loading"><div class="loader"></div><span>authenticating...</span></div>
 
         <div class="field" id="nameField">
-          <div class="field-top">
-            <label class="label" for="usernameInput">Name</label>
-            <span class="hint">shown in your dashboard</span>
-          </div>
-          <input id="usernameInput" class="input" type="text" placeholder="Your name" autocomplete="name" />
+          <label class="label">Name</label>
+          <input id="nameInput" class="input" type="text" placeholder="Your name" autocomplete="name" />
         </div>
-
         <div class="field" id="emailField">
-          <div class="field-top">
-            <label class="label" for="useremailInput">Email</label>
-            <span class="hint">used for cloud sync</span>
-          </div>
-          <input id="useremailInput" class="input" type="email" placeholder="you@example.com" autocomplete="email" />
+          <label class="label">Email</label>
+          <input id="emailInput" class="input" type="email" placeholder="you@example.com" autocomplete="email" />
         </div>
-
         <div class="field" id="passwordField">
-          <div class="field-top">
-            <label class="label" for="userpasswordInput">Password</label>
-            <span class="hint">minimum 6 characters</span>
-          </div>
+          <label class="label">Password</label>
           <div class="password-wrap">
-            <input id="userpasswordInput" class="input" type="password" placeholder="Create or enter password" autocomplete="current-password" />
-            <button id="passwordToggle" class="password-toggle" type="button">show</button>
+            <input id="passwordInput" class="input" type="password" placeholder="Min 6 characters" autocomplete="current-password" />
+            <button id="pwToggle" class="pw-toggle" type="button">show</button>
           </div>
         </div>
 
-        <div class="button-row">
-          <button id="authPrimaryBtn" class="btn btn-primary" type="button">Access dashboard</button>
-          <button id="authSecondaryBtn" class="btn btn-secondary" type="button">Continue as guest</button>
+        <div class="btn-row">
+          <button id="authBtn" class="btn btn-primary btn-full" type="button">Sign in</button>
         </div>
-
-        <div class="auth-pill-row">
-          <div class="pill">firebase auth</div>
-          <div class="pill">firestore sync</div>
-          <div class="pill">offline cache</div>
-          <div class="pill">notification reminders</div>
-        </div>
-
-        <div class="auth-foot">
-          <span id="authFootNote">signin mode is live, if the account doesn't exist yet this app can create it for you.</span>
-          <span>guest skips password and cloud</span>
-        </div>
-
-        <p class="footer-note">and yes, I changed the dumb error copy. Empty fields now say <strong>required info missing</strong>, not that broken “both fields” line.</p>
+        <div class="divider">or</div>
+        <button id="authAltBtn" class="btn btn-secondary btn-full" type="button">Continue as guest</button>
       </div>
-    </article>
-  </section>
-
-  <main id="appShell" class="app-shell">
-    <section class="workspace">
-      <div class="topbar">
-        <div class="topbar-left">
-          <div class="eyebrow">dashboard</div>
-          <h1 class="headline" id="headlineText">Track the days that actually matter.</h1>
-          <p class="subline">Mark your streak, catch missed days, change the window, and keep a clean history without babysitting the app.</p>
-        </div>
-        <div class="topbar-actions">
-          <span id="syncStatus" class="sync-chip good">● synced</span>
-          <span id="userChip" class="user-chip">loading user</span>
-          <button id="themeToggleApp" class="theme-switch" type="button">☀ Light</button>
-          <button id="logoutBtn" class="btn btn-secondary" type="button">sign out</button>
-        </div>
-      </div>
-
-      <section class="panel">
-        <div class="panel-header">
-          <div>
-            <div class="panel-title">Current cycle</div>
-            <p class="panel-subtitle">Your active habit gets the big canvas. Change the name, shift the date window, tweak expiry rules, then just mark the days and move on.</p>
-          </div>
-          <button id="saveCycleBtn" class="btn btn-primary" type="button">End cycle and save</button>
-        </div>
-
-        <div class="toolbar">
-          <div class="habit-editor">
-            <input id="habitNameInput" class="habit-input" type="text" placeholder="Name your habit" value="My Habit" />
-            <div class="meta-row">
-              <span id="periodChip" class="meta-chip gold">loading period</span>
-              <span id="timerChip" class="meta-chip blue">23h timer</span>
-              <span id="streakChip" class="meta-chip green" style="display:none;">🔥 0</span>
-              <span id="focusChip" class="meta-chip">0% complete</span>
-            </div>
-          </div>
-
-          <div class="control-stack">
-            <div class="segment">
-              <button id="toggleDatePanel" class="tool-btn" type="button">date tools</button>
-              <button id="toggleTimerPanel" class="tool-btn" type="button">timer tools</button>
-              <button id="toggleNotificationsBtn" class="tool-btn" type="button">notifications</button>
-            </div>
-            <div class="segment">
-              <button id="jumpTodayBtn" class="ghost-btn" type="button">jump to today</button>
-              <button id="resetDefaultsBtn" class="ghost-btn" type="button">reset defaults</button>
-            </div>
-          </div>
-        </div>
-
-        <div class="stat-grid">
-          <article class="insight-card">
-            <div class="insight-label">checked</div>
-            <div id="checkedValue" class="insight-value green">0</div>
-            <div class="insight-note">days you hit the target</div>
-          </article>
-          <article class="insight-card">
-            <div class="insight-label">crossed</div>
-            <div id="crossedValue" class="insight-value red">0</div>
-            <div class="insight-note">days you marked as missed</div>
-          </article>
-          <article class="insight-card">
-            <div class="insight-label">pending</div>
-            <div id="pendingValue" class="insight-value gold">0</div>
-            <div class="insight-note">still waiting for a choice</div>
-          </article>
-          <article class="insight-card">
-            <div class="insight-label">success rate</div>
-            <div id="successValue" class="insight-value blue">0%</div>
-            <div class="insight-note">checked divided by total days</div>
-          </article>
-        </div>
-
-        <div class="completion-strip">
-          <div class="bar"><div id="progressFill" class="bar-fill"></div></div>
-          <div class="bar-caption">
-            <span id="progressCaption">0 of 30 days marked</span>
-            <span id="completionCaption">plenty of room to tighten this up</span>
-          </div>
-        </div>
-
-        <div class="calendar-shell">
-          <div class="calendar-header">
-            <span>sun</span><span>mon</span><span>tue</span><span>wed</span><span>thu</span><span>fri</span><span>sat</span>
-          </div>
-          <div id="daysGrid" class="calendar-grid"></div>
-        </div>
-      </section>
-
-      <section class="panel">
-        <div class="panel-header">
-          <div>
-            <div class="panel-title">Saved cycles</div>
-            <p class="panel-subtitle">Past runs sit here with quick stats and a full day-by-day replay. Keep the good ones, delete the junk.</p>
-          </div>
-        </div>
-        <div id="historyList" class="history-list"></div>
-      </section>
     </section>
 
-    <aside class="side-column">
-      <section id="dateDrawer" class="drawer">
-        <div class="drawer-section">
-          <div class="drawer-title">Date window</div>
-          <p class="drawer-copy">Shift the start date and total day count. This resets the current active grid, so don't do it casually.</p>
-          <div class="field-grid">
-            <div class="split">
-              <div class="field">
-                <div class="field-top"><label class="label" for="adjDay">Start day</label></div>
-                <input id="adjDay" class="input" type="number" min="1" max="31" value="1" />
-              </div>
-              <div class="field">
-                <div class="field-top"><label class="label" for="adjMonth">Month</label></div>
-                <select id="adjMonth" class="select">
-                  <option value="0">Jan</option><option value="1">Feb</option><option value="2">Mar</option><option value="3">Apr</option><option value="4">May</option><option value="5">Jun</option><option value="6">Jul</option><option value="7">Aug</option><option value="8">Sep</option><option value="9">Oct</option><option value="10">Nov</option><option value="11">Dec</option>
-                </select>
-              </div>
-            </div>
-            <div class="split">
-              <div class="field">
-                <div class="field-top"><label class="label" for="adjYear">Year</label></div>
-                <input id="adjYear" class="input" type="number" min="2020" max="2099" value="2026" />
-              </div>
-              <div class="field">
-                <div class="field-top"><label class="label" for="adjDaysCount">Days</label></div>
-                <input id="adjDaysCount" class="input" type="number" min="1" max="366" value="30" />
-              </div>
-            </div>
-            <div class="button-row">
-              <button id="applyDateBtn" class="btn btn-primary" type="button">Apply window</button>
-              <button id="restoreDateBtn" class="btn btn-secondary" type="button">Back to monthly default</button>
-            </div>
-          </div>
+    <!-- APP -->
+    <section id="appWrap" class="app-wrap">
+      <div class="topbar">
+        <div class="topbar-left">
+          <span class="topbar-brand">Days Tracking Pro</span>
+        </div>
+        <div class="topbar-right">
+          <span id="syncChip" class="sync-chip good">● synced</span>
+          <span id="userChip" class="sync-chip">user</span>
+          <button id="themeBtn" class="pill" type="button">☀ light</button>
+          <button id="logoutBtn" class="pill" type="button">sign out</button>
+        </div>
+      </div>
+
+      <section class="panel">
+        <div class="panel-title">Current Cycle</div>
+        <p class="panel-sub">Mark each day as done or missed. End the cycle to save it to history.</p>
+        <input id="habitInput" class="habit-input" type="text" placeholder="Name your habit" value="My Habit" />
+        <div id="metaRow" class="meta-row"></div>
+
+        <div class="tools-row">
+          <button id="datePanelBtn" class="tool-btn" type="button">date tools</button>
+          <button id="timerPanelBtn" class="tool-btn" type="button">timer tools</button>
+          <button id="notifBtn" class="tool-btn" type="button">notifications off</button>
+          <button id="endCycleBtn" class="btn btn-primary" type="button">End cycle &amp; save</button>
         </div>
 
-        <div class="drawer-section">
-          <div class="drawer-title">Run notes</div>
-          <p class="drawer-copy">A strong default is 30 days starting on the 1st. Don't over-customize unless the habit actually needs it.</p>
-          <div class="timeline">
-            <div class="timeline-item"><div><strong>Short burst</strong><span>7 to 14 days for a test run</span></div><span>fast feedback</span></div>
-            <div class="timeline-item"><div><strong>Standard</strong><span>30 days for real habit tracking</span></div><span>best default</span></div>
-            <div class="timeline-item"><div><strong>Long cycle</strong><span>60 to 90 days for deep consistency</span></div><span>harder to maintain</span></div>
-          </div>
-        </div>
+        <div id="statGrid" class="stat-grid"></div>
+        <div class="bar"><div id="barFill" class="bar-fill"></div></div>
+        <div id="calGrid" class="calendar-grid"></div>
       </section>
 
-      <section id="timerDrawer" class="drawer">
-        <div class="drawer-section">
-          <div class="drawer-title">Expiry timer</div>
-          <p class="drawer-copy">If a marked day expires, it locks and disappears from the active grid. Cool feature, but a brutal one. Use it on purpose.</p>
-          <div class="auth-pill-row" id="timerPresetRow">
-            <button class="tag" data-ms="5000" type="button">5s</button>
-            <button class="tag" data-ms="60000" type="button">1m</button>
-            <button class="tag" data-ms="300000" type="button">5m</button>
-            <button class="tag" data-ms="1800000" type="button">30m</button>
-            <button class="tag" data-ms="3600000" type="button">1h</button>
-            <button class="tag" data-ms="18000000" type="button">5h</button>
-            <button class="tag" data-ms="36000000" type="button">10h</button>
-            <button class="tag" data-ms="82800000" type="button">23h</button>
-            <button class="tag" data-ms="86400000" type="button">24h</button>
-            <button class="tag" data-ms="never" type="button">Never</button>
-          </div>
-          <div class="field-grid" style="margin-top:20px;">
-            <div class="field">
-              <div class="field-top"><label class="label" for="customTimerInput">Custom timer</label><span class="hint">examples: 45m, 2h 30m, 90</span></div>
-              <input id="customTimerInput" class="input" type="text" placeholder="e.g. 2h 30m" />
-            </div>
-            <div class="button-row">
-              <button id="setCustomTimerBtn" class="btn btn-primary" type="button">Set custom timer</button>
-              <button id="removeTimerBtn" class="btn btn-secondary" type="button">Disable expiry</button>
-            </div>
-          </div>
-        </div>
-
-        <div class="drawer-section">
-          <div class="drawer-title">Reminder system</div>
-          <p class="drawer-copy">The app nudges when today or yesterday is still empty. It also shouts when you hit 5-day streak multiples.</p>
-          <div class="streak-list">
-            <div class="streak-item"><div><strong>Today reminder</strong><span>fires if today is unmarked</span></div><span>every 2h max</span></div>
-            <div class="streak-item"><div><strong>Yesterday reminder</strong><span>catches a missed day</span></div><span>once per day</span></div>
-            <div class="streak-item"><div><strong>Streak alert</strong><span>celebrates 5, 10, 15, etc.</span></div><span>small dopamine hit</span></div>
-          </div>
-        </div>
+      <section class="panel">
+        <div class="panel-title">Saved Cycles</div>
+        <p class="panel-sub">Past runs with stats and replay.</p>
+        <div id="historyList"></div>
       </section>
+    </section>
+  </div>
 
-      <section class="drawer">
-        <div class="drawer-section">
-          <div class="drawer-title">Quick analytics</div>
-          <p class="drawer-copy">Tiny snapshot so you can see if the run is stable or falling apart without overthinking it.</p>
-          <div class="analytics-grid">
-            <article class="insight-card">
-              <div class="insight-label">current streak</div>
-              <div id="sideStreakValue" class="insight-value gold">0</div>
-              <div class="insight-note">live checked streak</div>
-            </article>
-            <article class="insight-card">
-              <div class="insight-label">best streak</div>
-              <div id="sideBestValue" class="insight-value blue">0</div>
-              <div class="insight-note">best run in this cycle</div>
-            </article>
-            <article class="insight-card">
-              <div class="insight-label">marked</div>
-              <div id="sideMarkedValue" class="insight-value green">0</div>
-              <div class="insight-note">checked plus crossed</div>
-            </article>
-            <article class="insight-card">
-              <div class="insight-label">locked</div>
-              <div id="sideLockedValue" class="insight-value red">0</div>
-              <div class="insight-note">expired and gone</div>
-            </article>
-          </div>
-          <div class="tiny-chart" id="tinyChart" style="margin-top:20px;"></div>
-        </div>
-
-        <div class="drawer-section">
-          <div class="drawer-title">Report an issue</div>
-          <p class="drawer-copy">If something breaks, send it fast. That old form is still here, just less ugly now.</p>
-          <div id="complaintStatus" class="status"></div>
-          <textarea id="complaintText" class="textarea feedback-area" placeholder="What broke, what you expected, what actually happened"></textarea>
-          <div class="button-row">
-            <button id="sendComplaintBtn" class="btn btn-primary" type="button">Send report</button>
-            <button id="clearComplaintBtn" class="btn btn-secondary" type="button">Clear</button>
-          </div>
-        </div>
-      </section>
-    </aside>
-  </main>
-
-  <div id="recordModal" class="modal">
+  <!-- DATE MODAL -->
+  <div id="dateModal" class="modal">
     <div class="modal-card">
-      <div class="modal-head">
-        <div>
-          <h3 id="recordModalTitle" class="modal-title">Saved record</h3>
-          <p id="recordModalCopy" class="modal-copy">Replay the saved cycle day by day.</p>
-        </div>
-        <button class="btn btn-secondary" data-close-modal="recordModal" type="button">Close</button>
+      <div class="modal-title">Date Window</div>
+      <p class="modal-copy">Set the start date and how many days this cycle runs. This resets your current grid.</p>
+      <div class="split">
+        <div class="field"><label class="label">Day</label><input id="adjDay" class="input" type="number" min="1" max="31" value="1" /></div>
+        <div class="field"><label class="label">Month</label><select id="adjMonth" class="select"><option value="0">Jan</option><option value="1">Feb</option><option value="2">Mar</option><option value="3">Apr</option><option value="4">May</option><option value="5">Jun</option><option value="6">Jul</option><option value="7">Aug</option><option value="8">Sep</option><option value="9">Oct</option><option value="10">Nov</option><option value="11">Dec</option></select></div>
       </div>
-      <div id="recordGrid" class="record-grid"></div>
-    </div>
-  </div>
-
-  <div id="confirmModal" class="modal">
-    <div class="modal-card" style="max-width:620px;">
-      <div class="modal-head">
-        <div>
-          <h3 class="modal-title">End this cycle?</h3>
-          <p class="modal-copy">This saves the current run into history, clears the active grid, and starts the next cycle on the next day.</p>
-        </div>
-        <button class="btn btn-secondary" data-close-modal="confirmModal" type="button">Close</button>
+      <div class="split">
+        <div class="field"><label class="label">Year</label><input id="adjYear" class="input" type="number" min="2020" max="2099" value="2026" /></div>
+        <div class="field"><label class="label">Days count</label><input id="adjDays" class="input" type="number" min="1" max="366" value="30" /></div>
       </div>
-      <div class="button-row">
-        <button id="confirmCycleBtn" class="btn btn-primary" type="button">Save cycle</button>
-        <button class="btn btn-secondary" data-close-modal="confirmModal" type="button">Not yet</button>
+      <div class="btn-row">
+        <button id="applyDateBtn" class="btn btn-primary" type="button">Apply</button>
+        <button id="resetDateBtn" class="btn btn-secondary" type="button">Reset to default</button>
+        <button class="btn btn-secondary" data-close="dateModal" type="button">Close</button>
       </div>
     </div>
   </div>
 
+  <!-- TIMER MODAL -->
+  <div id="timerModal" class="modal">
+    <div class="modal-card">
+      <div class="modal-title">Expiry Timer</div>
+      <p class="modal-copy">Marked days expire and lock after this duration. Set to "Never" to disable.</p>
+      <div id="timerPresets" class="timer-presets"></div>
+      <div class="field"><label class="label">Custom (e.g. 2h 30m)</label><input id="customTimerInput" class="input" type="text" placeholder="e.g. 45m or 2h 30m" /></div>
+      <div class="btn-row">
+        <button id="setTimerBtn" class="btn btn-primary" type="button">Set custom</button>
+        <button id="offTimerBtn" class="btn btn-secondary" type="button">Disable timer</button>
+        <button class="btn btn-secondary" data-close="timerModal" type="button">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- CONFIRM END MODAL -->
+  <div id="endModal" class="modal">
+    <div class="modal-card">
+      <div class="modal-title">End this cycle?</div>
+      <p class="modal-copy">Saves current data to history and starts a new cycle.</p>
+      <div class="btn-row">
+        <button id="confirmEndBtn" class="btn btn-primary" type="button">Save &amp; end</button>
+        <button class="btn btn-secondary" data-close="endModal" type="button">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- VIEW RECORD MODAL -->
+  <div id="viewModal" class="modal">
+    <div class="modal-card">
+      <div id="viewTitle" class="modal-title">Record</div>
+      <div id="viewGrid" class="calendar-grid" style="margin-top:16px;"></div>
+      <div class="btn-row"><button class="btn btn-secondary" data-close="viewModal" type="button">Close</button></div>
+    </div>
+  </div>
+
+  <!-- DELETE MODAL -->
   <div id="deleteModal" class="modal">
-    <div class="modal-card" style="max-width:620px;">
-      <div class="modal-head">
-        <div>
-          <h3 class="modal-title">Delete this saved cycle?</h3>
-          <p class="modal-copy">No undo here. If the record matters, don't be reckless.</p>
-        </div>
-        <button class="btn btn-secondary" data-close-modal="deleteModal" type="button">Close</button>
-      </div>
-      <div class="button-row">
-        <button id="confirmDeleteBtn" class="btn btn-primary" type="button">Delete record</button>
-        <button class="btn btn-secondary" data-close-modal="deleteModal" type="button">Keep it</button>
+    <div class="modal-card">
+      <div class="modal-title">Delete this record?</div>
+      <p class="modal-copy">This can't be undone.</p>
+      <div class="btn-row">
+        <button id="confirmDeleteBtn" class="btn btn-primary" type="button">Delete</button>
+        <button class="btn btn-secondary" data-close="deleteModal" type="button">Keep</button>
       </div>
     </div>
   </div>
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/12.15.0/firebase-app.js";
-    import { getAnalytics, isSupported as analyticsSupported } from "https://www.gstatic.com/firebasejs/12.15.0/firebase-analytics.js";
-    import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.15.0/firebase-auth.js";
+    import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged, signOut, setPersistence, browserLocalPersistence } from "https://www.gstatic.com/firebasejs/12.15.0/firebase-auth.js";
     import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/12.15.0/firebase-firestore.js";
 
-    const firebaseConfig = {
-      apiKey: "AIzaSyCyX3Dgf7cMcg7TACniyOgKvJho-gZPbv0",
-      authDomain: "daystracker-datastorage.firebaseapp.com",
-      projectId: "daystracker-datastorage",
-      storageBucket: "daystracker-datastorage.firebasestorage.app",
-      messagingSenderId: "477551258256",
-      appId: "1:477551258256:web:23cd13af0bd7c136c70615",
-      measurementId: "G-K9EZM7F597"
-    };
+    const firebaseConfig = { apiKey: "AIzaSyCyX3Dgf7cMcg7TACniyOgKvJho-gZPbv0", authDomain: "daystracker-datastorage.firebaseapp.com", projectId: "daystracker-datastorage", storageBucket: "daystracker-datastorage.firebasestorage.app", messagingSenderId: "477551258256", appId: "1:477551258256:web:23cd13af0bd7c136c70615", measurementId: "G-K9EZM7F597" };
 
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
     const db = getFirestore(app);
 
-    analyticsSupported().then((ok) => {
-      if (ok) getAnalytics(app);
-    }).catch(() => {});
+    // Force local persistence so user stays logged in after closing device
+    setPersistence(auth, browserLocalPersistence).catch(() => {});
 
-    const DEFAULT_FADE = 23 * 60 * 60 * 1000;
-    const MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
-    const DAYS = ['SU', 'MO', 'TU', 'WE', 'TH', 'FR', 'SA'];
-    const STORAGE_KEYS = {
-      active: 'dtp_active',
-      theme: 'dtp_theme',
-      notif: 'dtp_notif'
-    };
+    const FADE_DEFAULT = 23*3600000;
+    const MO = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+    const DS = ['SU','MO','TU','WE','TH','FR','SA'];
+    const PRESETS = [['5s',5000],['1m',60000],['5m',300000],['30m',1800000],['1h',3600000],['5h',18000000],['10h',36000000],['23h',82800000],['24h',86400000],['Never','never']];
 
-    const state = {
-      userData: null,
-      activeEmail: null,
-      activeUid: null,
-      isOnline: navigator.onLine,
-      syncTimer: null,
-      pollTimer: null,
-      countdownTimer: null,
-      notifTimer: null,
-      deleteIndex: null,
-      lastCloudUpdatedAt: null,
-      loginMode: 'signin',
-      passwordVisible: false
-    };
+    let S = { data: null, email: null, uid: null, online: navigator.onLine, syncT: null, pollT: null, tickT: null, delIdx: null, lastCloud: null, mode: 'signin', pwVis: false };
 
-    const els = {
-      loginScreen: document.getElementById('loginScreen'),
-      appShell: document.getElementById('appShell'),
-      loginStatus: document.getElementById('loginStatus'),
-      usernameInput: document.getElementById('usernameInput'),
-      useremailInput: document.getElementById('useremailInput'),
-      userpasswordInput: document.getElementById('userpasswordInput'),
-      passwordToggle: document.getElementById('passwordToggle'),
-      authPrimaryBtn: document.getElementById('authPrimaryBtn'),
-      authSecondaryBtn: document.getElementById('authSecondaryBtn'),
-      loginTitle: document.getElementById('loginTitle'),
-      loginSub: document.getElementById('loginSub'),
-      authFootNote: document.getElementById('authFootNote'),
-      modeButtons: Array.from(document.querySelectorAll('.mode-btn')),
-      themeToggleLogin: document.getElementById('themeToggleLogin'),
-      themeToggleApp: document.getElementById('themeToggleApp'),
-      headlineText: document.getElementById('headlineText'),
-      syncStatus: document.getElementById('syncStatus'),
-      userChip: document.getElementById('userChip'),
-      logoutBtn: document.getElementById('logoutBtn'),
-      habitNameInput: document.getElementById('habitNameInput'),
-      periodChip: document.getElementById('periodChip'),
-      timerChip: document.getElementById('timerChip'),
-      streakChip: document.getElementById('streakChip'),
-      focusChip: document.getElementById('focusChip'),
-      checkedValue: document.getElementById('checkedValue'),
-      crossedValue: document.getElementById('crossedValue'),
-      pendingValue: document.getElementById('pendingValue'),
-      successValue: document.getElementById('successValue'),
-      progressFill: document.getElementById('progressFill'),
-      progressCaption: document.getElementById('progressCaption'),
-      completionCaption: document.getElementById('completionCaption'),
-      daysGrid: document.getElementById('daysGrid'),
-      historyList: document.getElementById('historyList'),
-      saveCycleBtn: document.getElementById('saveCycleBtn'),
-      sideStreakValue: document.getElementById('sideStreakValue'),
-      sideBestValue: document.getElementById('sideBestValue'),
-      sideMarkedValue: document.getElementById('sideMarkedValue'),
-      sideLockedValue: document.getElementById('sideLockedValue'),
-      tinyChart: document.getElementById('tinyChart'),
-      toggleDatePanel: document.getElementById('toggleDatePanel'),
-      toggleTimerPanel: document.getElementById('toggleTimerPanel'),
-      toggleNotificationsBtn: document.getElementById('toggleNotificationsBtn'),
-      jumpTodayBtn: document.getElementById('jumpTodayBtn'),
-      resetDefaultsBtn: document.getElementById('resetDefaultsBtn'),
-      adjDay: document.getElementById('adjDay'),
-      adjMonth: document.getElementById('adjMonth'),
-      adjYear: document.getElementById('adjYear'),
-      adjDaysCount: document.getElementById('adjDaysCount'),
-      applyDateBtn: document.getElementById('applyDateBtn'),
-      restoreDateBtn: document.getElementById('restoreDateBtn'),
-      timerPresetRow: document.getElementById('timerPresetRow'),
-      customTimerInput: document.getElementById('customTimerInput'),
-      setCustomTimerBtn: document.getElementById('setCustomTimerBtn'),
-      removeTimerBtn: document.getElementById('removeTimerBtn'),
-      complaintStatus: document.getElementById('complaintStatus'),
-      complaintText: document.getElementById('complaintText'),
-      sendComplaintBtn: document.getElementById('sendComplaintBtn'),
-      clearComplaintBtn: document.getElementById('clearComplaintBtn'),
-      toast: document.getElementById('toast'),
-      recordModal: document.getElementById('recordModal'),
-      recordModalTitle: document.getElementById('recordModalTitle'),
-      recordModalCopy: document.getElementById('recordModalCopy'),
-      recordGrid: document.getElementById('recordGrid'),
-      confirmModal: document.getElementById('confirmModal'),
-      confirmCycleBtn: document.getElementById('confirmCycleBtn'),
-      deleteModal: document.getElementById('deleteModal'),
-      confirmDeleteBtn: document.getElementById('confirmDeleteBtn'),
-      modalClosers: Array.from(document.querySelectorAll('[data-close-modal]')),
-      dateDrawer: document.getElementById('dateDrawer'),
-      timerDrawer: document.getElementById('timerDrawer'),
-      nameField: document.getElementById('nameField'),
-      emailField: document.getElementById('emailField'),
-      passwordField: document.getElementById('passwordField')
-    };
+    const $ = (id) => document.getElementById(id);
+    const fk = (d) => `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+    const isG = (e) => !e || e === 'guest@local.app';
+    const esc = (s) => { const d = document.createElement('div'); d.textContent = s; return d.innerHTML; };
 
-    function localKey(email) { return 'dtp_' + email; }
-    function lastEditKey(email) { return 'dtp_lastedit_' + email; }
-    function reminderKey(email) { return 'dtp_lr_' + email; }
-    function yesterdayKey(email) { return 'dtp_ly_' + email; }
-    function streakKey(email) { return 'dtp_sn_' + email; }
+    function toast(m, t='info') { const e = $('toast'); e.textContent = m; e.className = `toast show ${t}`; clearTimeout(toast.t); toast.t = setTimeout(() => e.className = 'toast', 3000); }
+    function showSt(el, m, t='error') { el.textContent = m; el.className = `status show ${t}`; }
+    function hideSt(el) { el.className = 'status'; }
+    function hideLoad() { $('loadingScreen').classList.add('hidden'); }
+    function showAuthLoad() { $('authLoading').classList.add('show'); $('authBtn').disabled = true; }
+    function hideAuthLoad() { $('authLoading').classList.remove('show'); $('authBtn').disabled = false; }
 
-    function showToast(message, type = 'info') {
-      els.toast.textContent = message;
-      els.toast.className = `toast show ${type}`;
-      clearTimeout(showToast.timer);
-      showToast.timer = setTimeout(() => {
-        els.toast.className = 'toast';
-      }, 3200);
+    function makeDef(n, e) { return { profileName: n||'Guest', profileEmail: e||'guest@local.app', habitName: 'My Habit', customStart: null, daysCount: 30, fadeDuration: FADE_DEFAULT, trackerData: {}, timestamps: {}, locked: {}, history: [], lastActive: Date.now() }; }
+    function ensure(u) { if (!u) return makeDef('Guest','guest@local.app'); u.trackerData||={}; u.timestamps||={}; u.locked||={}; u.history||=[]; u.habitName||='My Habit'; u.fadeDuration??=FADE_DEFAULT; u.customStart??=null; u.daysCount??=30; return u; }
+
+    function saveL() { if (!S.email||!S.data) return; localStorage.setItem('dtp_'+S.email, JSON.stringify(S.data)); localStorage.setItem('dtp_active', S.email); if (!isG(S.email)) localStorage.setItem('dtp_le_'+S.email, String(Date.now())); }
+    function loadL(e) { try { return JSON.parse(localStorage.getItem('dtp_'+e)||''); } catch { return null; } }
+
+    function setSync(t) { const el = $('syncChip'); const m = { synced:['sync-chip good','● synced'], guest:['sync-chip','● guest'], offline:['sync-chip bad','● offline'] }; const [c,x] = m[t]||m.offline; el.className = c; el.textContent = x; }
+
+    async function push(retry=false) {
+      if (isG(S.email)||!S.data||!S.uid||!S.online) return;
+      const now = new Date().toISOString();
+      try { await setDoc(doc(db,'users',S.uid),{email:S.email,data:S.data,updated_at:now}); S.lastCloud=now; setSync('synced'); }
+      catch(e) { console.error(e); if (!retry) setTimeout(()=>push(true),3500); }
     }
-
-    function showStatus(el, message, type = 'error') {
-      el.textContent = message;
-      el.className = `status show ${type}`;
+    function schedSync() { if (isG(S.email)) return setSync('guest'); if (!S.online) return setSync('offline'); clearTimeout(S.syncT); S.syncT = setTimeout(()=>push(),1200); }
+    async function pull() {
+      if (isG(S.email)||!S.uid||!S.online) return;
+      try { const snap = await getDoc(doc(db,'users',S.uid)); if (!snap.exists()) return; const p = snap.data(); if (!p.data||!p.updated_at) return; if (S.lastCloud && new Date(p.updated_at)<=new Date(S.lastCloud)) return; const n = S.data?.profileName||''; S.data = ensure(p.data); if (n) S.data.profileName=n; S.lastCloud=p.updated_at; saveL(); render(); toast('Synced from cloud.','info'); } catch(e) { console.error(e); }
     }
+    function startPoll() { stopPoll(); S.pollT = setInterval(pull, 45000); }
+    function stopPoll() { if (S.pollT) clearInterval(S.pollT); S.pollT=null; }
 
-    function hideStatus(el) {
-      el.textContent = '';
-      el.className = 'status';
-    }
+    function persist() { if (!S.data) return; S.data.lastActive=Date.now(); saveL(); schedSync(); }
 
-    function formatKey(date) {
-      return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
-    }
+    function getStart() { if (!S.data) return new Date(); if (S.data.customStart) return new Date(S.data.customStart); const n=new Date(); return new Date(n.getFullYear(),n.getMonth(),1); }
+    function getDates() { const s=getStart(), t=S.data?.daysCount||30, a=[]; for(let i=0;i<t;i++){const d=new Date(s);d.setDate(s.getDate()+i);a.push(d);} return a; }
 
-    function isGuest(email) {
-      return !email || email === 'guest@local.app';
-    }
+    function ensureWindow() { if (!S.data) return; getDates().forEach(d=>{const k=fk(d); if(!S.data.trackerData[k])S.data.trackerData[k]='none'; if(!S.data.timestamps[k])S.data.timestamps[k]=Date.now();}); }
 
-    function safeParse(json) {
-      try { return JSON.parse(json); } catch { return null; }
-    }
+    function getFD() { return S.data?.fadeDuration==='never'?'never':(S.data?.fadeDuration||FADE_DEFAULT); }
+    function fadeFor(k) { const fd=getFD(); if (fd==='never') return null; const ts=S.data?.timestamps[k]; if(!ts) return null; const rem=fd-(Date.now()-ts); if(rem<=0) return 'expired'; let t=''; if(rem<60000)t=Math.ceil(rem/1000)+'s'; else if(rem<3600000)t=Math.ceil(rem/60000)+'m'; else{const h=Math.floor(rem/3600000),m=Math.floor((rem%3600000)/60000);t=h<5&&m>0?h+'h '+m+'m':h+'h';} return {t,urgent:rem<fd*0.1}; }
+    function fmtDur(ms) { if(ms==='never')return'Never'; if(ms<60000)return Math.round(ms/1000)+'s'; if(ms<3600000)return Math.round(ms/60000)+'m'; if(ms<86400000){const h=ms/3600000;return(h%1===0?h:h.toFixed(1))+'h';} const d=ms/86400000;return(d%1===0?d:d.toFixed(1))+'d'; }
+    function parseTimer(s) { s=s.trim().toLowerCase(); if(!s) return null; let t=0,f=false; const h=s.match(/(\d+(?:\.\d+)?)\s*h/); if(h){t+=parseFloat(h[1])*3600000;f=true;} const m=s.match(/(\d+(?:\.\d+)?)\s*m(?!s)/); if(m){t+=parseFloat(m[1])*60000;f=true;} const ss=s.match(/(\d+(?:\.\d+)?)\s*s/); if(ss){t+=parseFloat(ss[1])*1000;f=true;} if(!f&&!isNaN(parseFloat(s))){t=parseFloat(s)*60000;f=true;} return f?t:null; }
 
-    function escapeHtml(str) {
-      const div = document.createElement('div');
-      div.textContent = str;
-      return div.innerHTML;
-    }
+    function streaks() { if(!S.data)return{cur:0,best:0}; const dates=getDates(); let best=0,tmp=0,cur=0; dates.forEach(d=>{if(S.data.trackerData[fk(d)]==='checked'){tmp++;if(tmp>best)best=tmp;}else tmp=0;}); for(let i=dates.length-1;i>=0;i--){if(S.data.trackerData[fk(dates[i])]==='checked')cur++;else if(cur>0)break;} return{cur,best}; }
+    function stats() { if(!S.data)return{ck:0,cr:0,pend:0,tot:0,rate:0}; const tot=S.data.daysCount||30; let ck=0,cr=0; getDates().forEach(d=>{const v=S.data.trackerData[fk(d)]; if(v==='checked')ck++; if(v==='crossed')cr++;}); return{ck,cr,pend:tot-ck-cr,tot,rate:tot>0?Math.round(ck/tot*100):0}; }
 
-    function makeDefaultUser(name, email) {
-      return {
-        profileName: name || 'Guest',
-        profileEmail: email || 'guest@local.app',
-        habitName: 'My Target Habit',
-        customStart: null,
-        daysCount: 30,
-        fadeDuration: DEFAULT_FADE,
-        trackerData: {},
-        timestamps: {},
-        locked: {},
-        history: [],
-        notes: {},
-        lastActive: Date.now()
-      };
-    }
-
-    function ensureUserData(user) {
-      if (!user) return makeDefaultUser('Guest', 'guest@local.app');
-      user.profileName ||= 'Guest';
-      user.profileEmail ||= 'guest@local.app';
-      user.habitName ||= 'My Target Habit';
-      user.customStart ??= null;
-      user.daysCount ??= 30;
-      user.fadeDuration ??= DEFAULT_FADE;
-      user.trackerData ||= {};
-      user.timestamps ||= {};
-      user.locked ||= {};
-      user.history ||= [];
-      user.notes ||= {};
-      user.lastActive ||= Date.now();
-      return user;
-    }
-
-    function saveLocal() {
-      if (!state.activeEmail || !state.userData) return;
-      localStorage.setItem(localKey(state.activeEmail), JSON.stringify(state.userData));
-      localStorage.setItem(STORAGE_KEYS.active, state.activeEmail);
-      if (!isGuest(state.activeEmail)) localStorage.setItem(lastEditKey(state.activeEmail), String(Date.now()));
-    }
-
-    function loadLocal(email) {
-      return safeParse(localStorage.getItem(localKey(email)) || '');
-    }
-
-    function setTheme(theme) {
-      if (theme === 'dark') document.body.removeAttribute('data-theme');
-      else document.body.setAttribute('data-theme', theme);
-      localStorage.setItem(STORAGE_KEYS.theme, theme);
-      const labels = { dark: '☀ Light', light: '◐ Grey', grey: '☾ Dark' };
-      els.themeToggleLogin.textContent = labels[theme];
-      els.themeToggleApp.textContent = labels[theme];
-    }
-
-    function cycleTheme() {
-      const current = document.body.getAttribute('data-theme') || 'dark';
-      const order = ['dark', 'light', 'grey'];
-      const next = order[(order.indexOf(current) + 1) % order.length];
-      setTheme(next);
-    }
-
-    function initTheme() {
-      const stored = localStorage.getItem(STORAGE_KEYS.theme) || 'dark';
-      setTheme(stored);
-    }
-
-    function setSyncStatus(type) {
-      const map = {
-        synced: ['sync-chip good', '● synced'],
-        syncing: ['sync-chip warn', '● syncing'],
-        guest: ['sync-chip', '● guest only'],
-        offline: ['sync-chip bad', '● offline']
-      };
-      const [klass, text] = map[type] || map.offline;
-      els.syncStatus.className = klass;
-      els.syncStatus.textContent = text;
-    }
-
-    async function pushCloud(retrying = false) {
-      if (isGuest(state.activeEmail) || !state.userData || !state.activeUid) return;
-      if (!state.isOnline) return setSyncStatus('offline');
-      setSyncStatus('syncing');
-      const nowIso = new Date().toISOString();
-      try {
-        await setDoc(doc(db, 'users', state.activeUid), {
-          email: state.activeEmail,
-          data: state.userData,
-          updated_at: nowIso
-        });
-        state.lastCloudUpdatedAt = nowIso;
-        setSyncStatus('synced');
-      } catch (error) {
-        console.error('Cloud sync failed', error);
-        if (!retrying) setTimeout(() => pushCloud(true), 3500);
-        else setSyncStatus('offline');
-      }
-    }
-
-    function scheduleCloudSync() {
-      if (isGuest(state.activeEmail) || !state.userData) return setSyncStatus('guest');
-      if (!state.isOnline) return setSyncStatus('offline');
-      clearTimeout(state.syncTimer);
-      state.syncTimer = setTimeout(() => pushCloud(false), 1200);
-    }
-
-    async function loadCloud(uid, email) {
-      if (isGuest(email)) { setSyncStatus('guest'); return null; }
-      if (!state.isOnline) { setSyncStatus('offline'); return null; }
-      setSyncStatus('syncing');
-      try {
-        const snap = await getDoc(doc(db, 'users', uid));
-        if (!snap.exists()) {
-          setSyncStatus('synced');
-          return null;
-        }
-        const data = snap.data();
-        state.lastCloudUpdatedAt = data.updated_at || null;
-        setSyncStatus('synced');
-        return data.data || null;
-      } catch (error) {
-        console.error('Cloud load failed', error);
-        setSyncStatus('offline');
-        return null;
-      }
-    }
-
-    async function pullCloud() {
-      if (isGuest(state.activeEmail) || !state.activeUid || !state.isOnline) return;
-      try {
-        const snap = await getDoc(doc(db, 'users', state.activeUid));
-        if (!snap.exists()) return;
-        const payload = snap.data();
-        if (!payload.updated_at || !payload.data) return;
-        if (state.lastCloudUpdatedAt && new Date(payload.updated_at) <= new Date(state.lastCloudUpdatedAt)) return;
-        const keepName = state.userData?.profileName || '';
-        state.userData = ensureUserData(payload.data);
-        if (keepName) state.userData.profileName = keepName;
-        state.lastCloudUpdatedAt = payload.updated_at;
-        saveLocal();
-        renderApp();
-        showToast('Pulled newer changes from cloud.', 'info');
-      } catch (error) {
-        console.error('Cloud pull failed', error);
-      }
-    }
-
-    function startPoll() {
-      stopPoll();
-      state.pollTimer = setInterval(pullCloud, 45000);
-    }
-
-    function stopPoll() {
-      if (state.pollTimer) clearInterval(state.pollTimer);
-      state.pollTimer = null;
-    }
-
-    function isNotificationsOn() {
-      return localStorage.getItem(STORAGE_KEYS.notif) === 'on';
-    }
-
-    function updateNotificationButton() {
-      els.toggleNotificationsBtn.textContent = isNotificationsOn() ? 'notifications on' : 'notifications off';
-      els.toggleNotificationsBtn.classList.toggle('active', isNotificationsOn());
-    }
-
-    function sendNotification(title, body) {
-      if (!isNotificationsOn() || !('Notification' in window) || Notification.permission !== 'granted') return;
-      try {
-        new Notification(title, { body, icon: './icon-192.png' });
-      } catch {
-        if ('serviceWorker' in navigator && navigator.serviceWorker.ready) {
-          navigator.serviceWorker.ready.then((reg) => reg.showNotification(title, { body, icon: './icon-192.png' }));
-        }
-      }
-    }
-
-    function startNotificationsLoop() {
-      stopNotificationsLoop();
-      setTimeout(() => { checkReminders(); checkStreakNotification(); }, 2500);
-      state.notifTimer = setInterval(checkReminders, 1800000);
-    }
-
-    function stopNotificationsLoop() {
-      if (state.notifTimer) clearInterval(state.notifTimer);
-      state.notifTimer = null;
-    }
-
-    function checkReminders() {
-      if (!state.userData || !state.activeEmail || !isNotificationsOn()) return;
-      const todayKey = formatKey(new Date());
-      const todayState = state.userData.trackerData[todayKey];
-      const reminderStamp = localStorage.getItem(reminderKey(state.activeEmail));
-      if (!todayState || todayState === 'none') {
-        const now = Date.now();
-        if (!reminderStamp || now - parseInt(reminderStamp, 10) > 7200000) {
-          sendNotification('Days Tracking Pro', 'You still have not marked today.');
-          localStorage.setItem(reminderKey(state.activeEmail), String(now));
-        }
-      }
-
-      const yesterday = new Date();
-      yesterday.setDate(yesterday.getDate() - 1);
-      const yesterdayState = state.userData.trackerData[formatKey(yesterday)];
-      const yesterdayStamp = localStorage.getItem(yesterdayKey(state.activeEmail));
-      if (yesterdayState === 'none') {
-        const now = Date.now();
-        if (!yesterdayStamp || now - parseInt(yesterdayStamp, 10) > 86400000) {
-          sendNotification('Missed yesterday', 'You forgot to mark yesterday.');
-          localStorage.setItem(yesterdayKey(state.activeEmail), String(now));
-        }
-      }
-    }
-
-    function checkStreakNotification() {
-      if (!state.userData || !state.activeEmail || !isNotificationsOn()) return;
-      const { currentStreak } = computeStreaks();
-      if (currentStreak > 0 && currentStreak % 5 === 0) {
-        const last = localStorage.getItem(streakKey(state.activeEmail));
-        if (last !== String(currentStreak)) {
-          sendNotification(`Streak: ${currentStreak} days`, 'Keep going. This is the part where most people quit.');
-          localStorage.setItem(streakKey(state.activeEmail), String(currentStreak));
-        }
-      }
-    }
-
-    function getStartDate() {
-      if (!state.userData) return new Date();
-      if (state.userData.customStart) return new Date(state.userData.customStart);
-      const now = new Date();
-      return new Date(now.getFullYear(), now.getMonth(), 1);
-    }
-
-    function ensureTrackerWindow() {
-      if (!state.userData) return;
-      const start = getStartDate();
-      const total = state.userData.daysCount || 30;
-      for (let i = 0; i < total; i += 1) {
-        const date = new Date(start);
-        date.setDate(start.getDate() + i);
-        const key = formatKey(date);
-        if (!state.userData.trackerData[key]) state.userData.trackerData[key] = 'none';
-        if (!state.userData.timestamps[key]) state.userData.timestamps[key] = Date.now();
-      }
-    }
-
-    function parseTimerInput(value) {
-      const str = value.trim().toLowerCase();
-      if (!str) return null;
-      let total = 0;
-      let matched = false;
-      const h = str.match(/(\d+(?:\.\d+)?)\s*h/);
-      const m = str.match(/(\d+(?:\.\d+)?)\s*m(?!s)/);
-      const s = str.match(/(\d+(?:\.\d+)?)\s*s/);
-      if (h) { total += parseFloat(h[1]) * 3600000; matched = true; }
-      if (m) { total += parseFloat(m[1]) * 60000; matched = true; }
-      if (s) { total += parseFloat(s[1]) * 1000; matched = true; }
-      if (!matched && !Number.isNaN(parseFloat(str))) {
-        total = parseFloat(str) * 60000;
-        matched = true;
-      }
-      return matched ? total : null;
-    }
-
-    function formatDuration(ms) {
-      if (ms === 'never') return 'Never';
-      if (ms < 60000) return `${Math.round(ms / 1000)}s`;
-      if (ms < 3600000) return `${Math.round(ms / 60000)}m`;
-      if (ms < 86400000) {
-        const h = ms / 3600000;
-        return `${h % 1 === 0 ? h : h.toFixed(1)}h`;
-      }
-      const d = ms / 86400000;
-      return `${d % 1 === 0 ? d : d.toFixed(1)}d`;
-    }
-
-    function getFadeDuration() {
-      if (!state.userData) return DEFAULT_FADE;
-      return state.userData.fadeDuration === 'never' ? 'never' : (state.userData.fadeDuration || DEFAULT_FADE);
-    }
-
-    function fadeStatusFor(key) {
-      const duration = getFadeDuration();
-      if (duration === 'never' || !state.userData) return 'none';
-      const ts = state.userData.timestamps[key];
-      if (!ts) return 'none';
-      const remaining = duration - (Date.now() - ts);
-      if (remaining <= 0) return 'expired';
-      let text = '';
-      if (remaining < 60000) text = `${Math.ceil(remaining / 1000)}s`;
-      else if (remaining < 3600000) text = `${Math.ceil(remaining / 60000)}m`;
-      else {
-        const hours = Math.floor(remaining / 3600000);
-        const mins = Math.floor((remaining % 3600000) / 60000);
-        text = hours < 5 && mins > 0 ? `${hours}h ${mins}m` : `${hours}h`;
-      }
-      return { text, urgent: remaining < duration * 0.1 };
-    }
-
-    function getActiveDates() {
-      const start = getStartDate();
-      const total = state.userData?.daysCount || 30;
-      const items = [];
-      for (let i = 0; i < total; i += 1) {
-        const d = new Date(start);
-        d.setDate(start.getDate() + i);
-        items.push(d);
-      }
-      return items;
-    }
-
-    function computeStreaks() {
-      if (!state.userData) return { currentStreak: 0, bestStreak: 0 };
-      const dates = getActiveDates();
-      let best = 0;
-      let temp = 0;
-      let current = 0;
-      dates.forEach((date) => {
-        const value = state.userData.trackerData[formatKey(date)] || 'none';
-        if (value === 'checked') {
-          temp += 1;
-          if (temp > best) best = temp;
-        } else temp = 0;
-      });
-      for (let i = dates.length - 1; i >= 0; i -= 1) {
-        const key = formatKey(dates[i]);
-        if (state.userData.trackerData[key] === 'checked') current += 1;
-        else if (current > 0) break;
-      }
-      return { currentStreak: current, bestStreak: best };
-    }
-
-    function computeStats() {
-      if (!state.userData) return { checked: 0, crossed: 0, pending: 0, total: 0, rate: 0, locked: 0, marked: 0 };
-      const total = state.userData.daysCount || 30;
-      let checked = 0;
-      let crossed = 0;
-      let locked = 0;
-      getActiveDates().forEach((date) => {
-        const key = formatKey(date);
-        const value = state.userData.trackerData[key] || 'none';
-        if (value === 'checked') checked += 1;
-        if (value === 'crossed') crossed += 1;
-        if (state.userData.locked[key]) locked += 1;
-      });
-      const marked = checked + crossed;
-      const pending = total - marked;
-      const rate = total > 0 ? Math.round((checked / total) * 100) : 0;
-      return { checked, crossed, pending, total, rate, locked, marked };
-    }
-
-    function updateTinyChart() {
-      const dates = getActiveDates();
-      els.tinyChart.innerHTML = '';
-      dates.slice(Math.max(0, dates.length - 12)).forEach((date) => {
-        const key = formatKey(date);
-        const value = state.userData?.trackerData[key] || 'none';
-        const bar = document.createElement('span');
-        bar.style.height = value === 'checked' ? '100%' : value === 'crossed' ? '58%' : '24%';
-        bar.style.background = value === 'checked'
-          ? 'linear-gradient(180deg, var(--green), oklch(66% 0.12 165))'
-          : value === 'crossed'
-            ? 'linear-gradient(180deg, var(--red), oklch(60% 0.14 25))'
-            : 'linear-gradient(180deg, var(--blue), oklch(60% 0.1 240))';
-        els.tinyChart.appendChild(bar);
-      });
-    }
-
-    function renderHistory() {
-      const list = state.userData?.history || [];
-      if (!list.length) {
-        els.historyList.innerHTML = '<div class="empty">No saved cycles yet. Finish one clean run first, then this section gets interesting.</div>';
-        return;
-      }
-      els.historyList.innerHTML = list.map((record, index) => {
-        const rate = record.total > 0 ? Math.round((record.checked / record.total) * 100) : 0;
-        return `
-          <article class="history-card">
-            <div class="history-top">
-              <div>
-                <div class="history-name">${escapeHtml(record.habitName || 'Untitled')}</div>
-                <div class="history-period">${escapeHtml(record.period || '')}</div>
-              </div>
-              <div class="history-stat gold">${rate}% success</div>
-            </div>
-            <div class="history-stats">
-              <span class="history-stat green">✓ ${record.checked}</span>
-              <span class="history-stat red">✕ ${record.crossed}</span>
-              <span class="history-stat">total ${record.total}</span>
-              <span class="history-stat">saved ${new Date(record.savedAt || Date.now()).toLocaleDateString()}</span>
-            </div>
-            <div class="history-actions">
-              <button class="ghost-btn" data-view-record="${index}" type="button">view</button>
-              <button class="ghost-btn" data-delete-record="${index}" type="button">delete</button>
-            </div>
-          </article>
-        `;
+    function render() {
+      if(!S.data) return;
+      ensure(S.data); ensureWindow();
+      // meta
+      const start=getStart(), tot=S.data.daysCount||30, end=new Date(start); end.setDate(start.getDate()+tot-1);
+      $('habitInput').value=S.data.habitName||'My Habit';
+      $('userChip').textContent=isG(S.email)?S.data.profileName+', guest':S.data.profileName+', synced';
+      const {cur,best}=streaks(), st=stats();
+      $('metaRow').innerHTML=`<span class="meta-chip gold">${MO[start.getMonth()].slice(0,3)} ${start.getDate()} - ${MO[end.getMonth()].slice(0,3)} ${end.getDate()}, ${end.getFullYear()}</span><span class="meta-chip blue">${fmtDur(getFD())} timer</span>${cur?`<span class="meta-chip green">🔥 ${cur}${best>cur?' (best '+best+')':''}</span>`:''}`;
+      $('statGrid').innerHTML=`<div class="stat-card"><div class="stat-val green">${st.ck}</div><div class="stat-lbl">checked</div></div><div class="stat-card"><div class="stat-val red">${st.cr}</div><div class="stat-lbl">crossed</div></div><div class="stat-card"><div class="stat-val gold">${st.pend}</div><div class="stat-lbl">pending</div></div><div class="stat-card"><div class="stat-val blue">${st.rate}%</div><div class="stat-lbl">success</div></div>`;
+      $('barFill').style.width=`${Math.min(100,Math.round((st.ck+st.cr)/(st.tot||1)*100))}%`;
+      // calendar
+      const today=fk(new Date()), streakKeys=new Set();
+      if(cur>0){const dates=getDates();for(let i=dates.length-1;i>=0;i--){const k=fk(dates[i]);if(S.data.trackerData[k]==='checked')streakKeys.add(k);else if(streakKeys.size)break;}}
+      let locked=false;
+      $('calGrid').innerHTML=getDates().map(d=>{
+        const k=fk(d),v=S.data.trackerData[k]||'none';
+        if(v!=='none'){const f=fadeFor(k);if(f==='expired'&&!S.data.locked[k]){S.data.locked[k]=true;locked=true;}}
+        if(S.data.locked[k])return'';
+        const cls=['cal-day',v==='checked'?'checked':'',v==='crossed'?'crossed':'',streakKeys.has(k)?'streak':'',k===today?'today':''].filter(Boolean).join(' ');
+        return`<article class="${cls}" data-k="${k}"><div class="day-week">${DS[d.getDay()]}</div><div class="day-num">${d.getDate()}</div><div class="day-actions"><button class="mark-btn check ${v==='checked'?'on':''}" data-mark="checked" data-key="${k}" type="button">✓</button><button class="mark-btn cross ${v==='crossed'?'on':''}" data-mark="crossed" data-key="${k}" type="button">✕</button></div></article>`;
       }).join('');
+      if(locked) persist();
+      // history
+      const hist=S.data.history||[];
+      if(!hist.length){$('historyList').innerHTML='<div class="empty">No saved cycles yet.</div>';return;}
+      $('historyList').innerHTML=hist.map((r,i)=>{const rate=r.total>0?Math.round(r.checked/r.total*100):0;return`<div class="history-card"><div class="h-name">${esc(r.habitName||'Untitled')}</div><div class="h-period">${esc(r.period||'')}</div><div class="h-stats"><span class="h-stat green">✓ ${r.checked}</span><span class="h-stat red">✕ ${r.crossed}</span><span class="h-stat">${rate}%</span></div><div class="h-actions"><button class="ghost-btn" data-view="${i}" type="button">view</button><button class="ghost-btn" data-del="${i}" type="button">delete</button></div></div>`;}).join('');
+      if(isG(S.email))setSync('guest');else setSync(S.online?'synced':'offline');
+      saveL();
     }
 
-    function renderCalendar() {
-      if (!state.userData) return;
-      const dates = getActiveDates();
-      const todayKey = formatKey(new Date());
-      const { currentStreak } = computeStreaks();
-      const streakKeys = new Set();
-      if (currentStreak > 0) {
-        for (let i = dates.length - 1; i >= 0; i -= 1) {
-          const key = formatKey(dates[i]);
-          if (state.userData.trackerData[key] === 'checked') streakKeys.add(key);
-          else if (streakKeys.size) break;
-        }
+    function showLogin() { $('loginWrap').classList.add('active'); $('appWrap').classList.remove('active'); }
+    function showApp() { $('loginWrap').classList.remove('active'); $('appWrap').classList.add('active'); render(); startTick(); }
+
+    function startTick() { stopTick(); S.tickT=setInterval(()=>{if(getFD()==='never')return;let c=false;getDates().forEach(d=>{const k=fk(d);if(S.data?.locked[k])return;const v=S.data?.trackerData[k];if(!v||v==='none')return;const f=fadeFor(k);if(f==='expired'){S.data.locked[k]=true;c=true;}});if(c)persist();render();},1000); }
+    function stopTick() { if(S.tickT)clearInterval(S.tickT);S.tickT=null; }
+
+    // ═══════ AUTH ═══════
+    function updateMode(mode) {
+      S.mode=mode;
+      document.querySelectorAll('.mode-btn').forEach(b=>b.classList.toggle('active',b.dataset.mode===mode));
+      hideSt($('loginStatus'));
+      if(mode==='signin'){$('authBtn').textContent='Sign in';$('authAltBtn').textContent='Continue as guest';$('emailField').classList.remove('hide');$('passwordField').classList.remove('hide');}
+      else if(mode==='signup'){$('authBtn').textContent='Create account';$('authAltBtn').textContent='Back to sign in';$('emailField').classList.remove('hide');$('passwordField').classList.remove('hide');}
+      else{$('authBtn').textContent='Continue as guest';$('authAltBtn').textContent='Back to sign in';$('emailField').classList.add('hide');$('passwordField').classList.add('hide');}
+    }
+
+    async function doAuth() {
+      hideSt($('loginStatus'));
+      const name=$('nameInput').value.trim(), email=$('emailInput').value.trim(), pw=$('passwordInput').value;
+
+      if(S.mode==='guest'){
+        if(!name) return showSt($('loginStatus'),'enter your name first.');
+        S.email='guest@local.app'; S.uid='guest';
+        S.data=ensure(loadL('guest@local.app')||makeDef(name,'guest@local.app'));
+        S.data.profileName=name; saveL(); setSync('guest'); hideLoad(); showApp();
+        toast(`Guest mode, ${name}.`,'info'); return;
       }
 
-      let lockedAny = false;
-      els.daysGrid.innerHTML = dates.map((date) => {
-        const key = formatKey(date);
-        const stateValue = state.userData.trackerData[key] || 'none';
-        const fade = stateValue !== 'none' ? fadeStatusFor(key) : 'none';
-        if (fade === 'expired' && !state.userData.locked[key]) {
-          state.userData.locked[key] = true;
-          lockedAny = true;
-        }
-        if (state.userData.locked[key]) return '';
-        const classes = [
-          'calendar-day',
-          stateValue === 'checked' ? 'checked' : '',
-          stateValue === 'crossed' ? 'crossed' : '',
-          streakKeys.has(key) ? 'streak' : '',
-          key === todayKey ? 'today' : ''
-        ].filter(Boolean).join(' ');
-        const countdown = fade !== 'none' && fade !== 'expired'
-          ? `<span class="countdown ${fade.urgent ? 'urgent' : ''}">${fade.text}</span>`
-          : state.userData.locked[key]
-            ? '<span class="countdown urgent">expired</span>'
-            : '<span class="countdown info">open</span>';
-        const label = stateValue === 'checked' ? 'done' : stateValue === 'crossed' ? 'missed' : 'not marked';
-        return `
-          <article class="${classes}" data-day-key="${key}">
-            <div class="day-top">
-              <div>
-                <div class="day-week">${DAYS[date.getDay()]}</div>
-                <div class="day-number">${date.getDate()}</div>
-              </div>
-              ${countdown}
-            </div>
-            <div class="day-bottom">
-              <div class="day-state">${label}</div>
-              <div class="day-actions">
-                <button class="state-btn check ${stateValue === 'checked' ? 'active' : ''}" data-mark="checked" data-key="${key}" type="button">✓</button>
-                <button class="state-btn cross ${stateValue === 'crossed' ? 'active' : ''}" data-mark="crossed" data-key="${key}" type="button">✕</button>
-              </div>
-            </div>
-          </article>
-        `;
-      }).join('');
+      if(!name||!email||!pw) return showSt($('loginStatus'),'all fields are required. fill in name, email, and password.');
+      if(pw.length<6) return showSt($('loginStatus'),'password must be at least 6 characters.');
 
-      if (lockedAny) persistAndSync();
-    }
+      showAuthLoad();
 
-    function renderStats() {
-      const stats = computeStats();
-      const { currentStreak, bestStreak } = computeStreaks();
-      els.checkedValue.textContent = stats.checked;
-      els.crossedValue.textContent = stats.crossed;
-      els.pendingValue.textContent = stats.pending;
-      els.successValue.textContent = `${stats.rate}%`;
-      els.progressFill.style.width = `${Math.min(100, Math.round((stats.marked / (stats.total || 1)) * 100))}%`;
-      els.progressFill.style.background = stats.rate >= 70
-        ? 'linear-gradient(90deg, var(--green), var(--gold))'
-        : stats.rate >= 40
-          ? 'linear-gradient(90deg, var(--gold), var(--blue))'
-          : 'linear-gradient(90deg, var(--red), oklch(58% 0.12 20))';
-      els.progressCaption.textContent = `${stats.marked} of ${stats.total} days marked`;
-      els.completionCaption.textContent = stats.rate >= 80
-        ? 'solid run, keep it that way'
-        : stats.rate >= 50
-          ? 'not bad, but still loose'
-          : 'yeah, this needs tightening up';
-      els.streakChip.style.display = currentStreak || bestStreak ? 'inline-flex' : 'none';
-      els.streakChip.textContent = `🔥 ${currentStreak}${bestStreak > currentStreak ? ` (best ${bestStreak})` : ''}`;
-      els.focusChip.textContent = `${stats.rate}% complete`;
-      els.sideStreakValue.textContent = currentStreak;
-      els.sideBestValue.textContent = bestStreak;
-      els.sideMarkedValue.textContent = stats.marked;
-      els.sideLockedValue.textContent = stats.locked;
-      updateTinyChart();
-    }
-
-    function renderMeta() {
-      if (!state.userData) return;
-      const start = getStartDate();
-      const total = state.userData.daysCount || 30;
-      const end = new Date(start);
-      end.setDate(start.getDate() + total - 1);
-      els.periodChip.textContent = `${MONTHS[start.getMonth()].slice(0, 3)} ${start.getDate()} to ${MONTHS[end.getMonth()].slice(0, 3)} ${end.getDate()}, ${end.getFullYear()}`;
-      els.timerChip.textContent = `${formatDuration(getFadeDuration())} timer`;
-      els.userChip.textContent = isGuest(state.activeEmail)
-        ? `${state.userData.profileName}, guest mode`
-        : `${state.userData.profileName}, synced`;
-      els.headlineText.textContent = `${state.userData.habitName || 'My habit'}: keep the streak honest.`;
-      els.habitNameInput.value = state.userData.habitName || 'My Habit';
-      els.adjDay.value = start.getDate();
-      els.adjMonth.value = start.getMonth();
-      els.adjYear.value = start.getFullYear();
-      els.adjDaysCount.value = total;
-      highlightTimerButtons();
-    }
-
-    function highlightTimerButtons() {
-      const duration = getFadeDuration();
-      Array.from(els.timerPresetRow.querySelectorAll('.tag')).forEach((btn) => {
-        const ms = btn.dataset.ms;
-        btn.classList.toggle('active', (duration === 'never' && ms === 'never') || String(duration) === ms);
-      });
-    }
-
-    function renderApp() {
-      if (!state.userData) return;
-      ensureUserData(state.userData);
-      ensureTrackerWindow();
-      renderMeta();
-      renderStats();
-      renderCalendar();
-      renderHistory();
-      updateNotificationButton();
-      saveLocal();
-      if (isGuest(state.activeEmail)) setSyncStatus('guest');
-      else setSyncStatus(state.isOnline ? 'synced' : 'offline');
-    }
-
-    function showLoginScreen() {
-      els.loginScreen.classList.add('active');
-      els.appShell.classList.remove('active');
-    }
-
-    function showAppScreen() {
-      els.loginScreen.classList.remove('active');
-      els.appShell.classList.add('active');
-      renderApp();
-      startCountdownLoop();
-      if (isNotificationsOn()) startNotificationsLoop();
-    }
-
-    function persistAndSync() {
-      if (!state.userData) return;
-      state.userData.lastActive = Date.now();
-      saveLocal();
-      scheduleCloudSync();
-    }
-
-    function markDay(key, nextState) {
-      if (!state.userData) return;
-      if (state.userData.locked[key]) return showToast('That day already expired and locked.', 'error');
-      const current = state.userData.trackerData[key] || 'none';
-      state.userData.trackerData[key] = current === nextState ? 'none' : nextState;
-      state.userData.timestamps[key] = Date.now();
-      persistAndSync();
-      renderApp();
-      checkStreakNotification();
-    }
-
-    function resetMarkedTimestamps() {
-      if (!state.userData) return;
-      getActiveDates().forEach((date) => {
-        const key = formatKey(date);
-        if (state.userData.trackerData[key] && state.userData.trackerData[key] !== 'none') {
-          state.userData.timestamps[key] = Date.now();
-        }
-      });
-    }
-
-    function applyDateWindow() {
-      if (!state.userData) return;
-      const day = parseInt(els.adjDay.value, 10) || 1;
-      const month = parseInt(els.adjMonth.value, 10) || 0;
-      const year = parseInt(els.adjYear.value, 10) || new Date().getFullYear();
-      const count = Math.max(1, Math.min(366, parseInt(els.adjDaysCount.value, 10) || 30));
-      const maxDay = new Date(year, month + 1, 0).getDate();
-      const safeDay = Math.min(day, maxDay);
-      state.userData.customStart = new Date(year, month, safeDay).toISOString();
-      state.userData.daysCount = count;
-      state.userData.trackerData = {};
-      state.userData.timestamps = {};
-      state.userData.locked = {};
-      persistAndSync();
-      renderApp();
-      showToast('Date window updated.', 'success');
-    }
-
-    function resetDefaults() {
-      if (!state.userData) return;
-      state.userData.customStart = null;
-      state.userData.daysCount = 30;
-      state.userData.trackerData = {};
-      state.userData.timestamps = {};
-      state.userData.locked = {};
-      persistAndSync();
-      renderApp();
-      showToast('Back to the default monthly window.', 'info');
-    }
-
-    function setTimer(ms) {
-      if (!state.userData) return;
-      state.userData.fadeDuration = ms;
-      if (ms !== 'never') resetMarkedTimestamps();
-      persistAndSync();
-      renderApp();
-      showToast(ms === 'never' ? 'Expiry timer disabled.' : `Timer set to ${formatDuration(ms)}.`, 'success');
-    }
-
-    function startCountdownLoop() {
-      stopCountdownLoop();
-      state.countdownTimer = setInterval(() => {
-        if (getFadeDuration() === 'never') return;
-        let changed = false;
-        getActiveDates().forEach((date) => {
-          const key = formatKey(date);
-          if (state.userData?.locked[key]) return;
-          const value = state.userData?.trackerData[key] || 'none';
-          if (value === 'none') return;
-          const fade = fadeStatusFor(key);
-          if (fade === 'expired') {
-            state.userData.locked[key] = true;
-            changed = true;
+      try {
+        if(S.mode==='signup') {
+          // SIGNUP: only create, never sign in
+          try {
+            const cred = await createUserWithEmailAndPassword(auth, email, pw);
+            await finishAuth(name, email, cred.user.uid);
+            toast('Account created!','success');
+          } catch(e) {
+            hideAuthLoad();
+            if(e.code==='auth/email-already-in-use') showSt($('loginStatus'),'this email already has an account. switch to sign in.');
+            else showSt($('loginStatus'), e.message||'signup failed.');
           }
-        });
-        if (changed) persistAndSync();
-        renderCalendar();
-        renderStats();
-      }, 1000);
-    }
-
-    function stopCountdownLoop() {
-      if (state.countdownTimer) clearInterval(state.countdownTimer);
-      state.countdownTimer = null;
-    }
-
-    function openModal(id) { document.getElementById(id).classList.add('active'); }
-    function closeModal(id) { document.getElementById(id).classList.remove('active'); }
-
-    function viewRecord(index) {
-      const record = state.userData?.history?.[index];
-      if (!record) return;
-      els.recordModalTitle.textContent = record.habitName || 'Saved record';
-      els.recordModalCopy.textContent = record.period || 'Saved cycle';
-      els.recordGrid.innerHTML = (record.days || []).map((day) => `
-        <div class="record-box ${day.state === 'checked' ? 'checked' : day.state === 'crossed' ? 'crossed' : ''}">
-          <strong>${day.dayName || ''}</strong>
-          <span>${day.date || ''}</span>
-        </div>
-      `).join('');
-      openModal('recordModal');
-    }
-
-    function saveCycle() {
-      if (!state.userData) return;
-      const start = getStartDate();
-      const total = state.userData.daysCount || 30;
-      let checked = 0;
-      let crossed = 0;
-      const days = [];
-      for (let i = 0; i < total; i += 1) {
-        const date = new Date(start);
-        date.setDate(start.getDate() + i);
-        const key = formatKey(date);
-        const value = state.userData.trackerData[key] || 'none';
-        if (value === 'checked') checked += 1;
-        if (value === 'crossed') crossed += 1;
-        days.push({ date: date.getDate(), dayName: DAYS[date.getDay()], state: value });
-      }
-      const end = new Date(start);
-      end.setDate(start.getDate() + total - 1);
-      const period = `${MONTHS[start.getMonth()].slice(0, 3)} ${start.getDate()} - ${MONTHS[end.getMonth()].slice(0, 3)} ${end.getDate()}, ${end.getFullYear()}`;
-      state.userData.history.unshift({
-        habitName: state.userData.habitName,
-        period,
-        checked,
-        crossed,
-        total,
-        days,
-        savedAt: Date.now()
-      });
-      state.userData.trackerData = {};
-      state.userData.timestamps = {};
-      state.userData.locked = {};
-      const nextStart = new Date(end);
-      nextStart.setDate(nextStart.getDate() + 1);
-      state.userData.customStart = nextStart.toISOString();
-      persistAndSync();
-      renderApp();
-      closeModal('confirmModal');
-      showToast('Cycle saved to history.', 'success');
-    }
-
-    function deleteRecord() {
-      if (state.deleteIndex == null || !state.userData?.history?.[state.deleteIndex]) return;
-      state.userData.history.splice(state.deleteIndex, 1);
-      state.deleteIndex = null;
-      persistAndSync();
-      renderHistory();
-      closeModal('deleteModal');
-      showToast('Saved cycle deleted.', 'info');
-    }
-
-    function updateLoginMode(mode) {
-      state.loginMode = mode;
-      els.authFootNote.textContent = 'signin only works with existing accounts. no account? switch to sign up first.';
-      if (mode === 'signin') {
-        els.loginTitle.textContent = 'Welcome back';
-        els.loginSub.textContent = 'Use your name, email, and password to enter your synced tracker. Guest mode skips sync.';
-        els.authPrimaryBtn.textContent = 'Access dashboard';
-        els.authSecondaryBtn.textContent = 'Continue as guest';
-        els.authFootNote.textContent = 'signin mode is live, if the account does not exist yet this app can create it for you.';
-        els.nameField.style.display = '';
-        els.emailField.style.display = '';
-        els.passwordField.style.display = '';
-      } else if (mode === 'signup') {
-        els.loginTitle.textContent = 'Create your account';
-        els.loginSub.textContent = 'Same app, just explicit signup mode. Name, email, password, done.';
-        els.authPrimaryBtn.textContent = 'Create account';
-        els.authSecondaryBtn.textContent = 'Switch to sign in';
-        els.authFootNote.textContent = 'signup mode makes the intent clear, even though firebase can still create on the fly.';
-        els.nameField.style.display = '';
-        els.emailField.style.display = '';
-        els.passwordField.style.display = '';
-      } else {
-        els.loginTitle.textContent = 'Jump in as guest';
-        els.loginSub.textContent = 'Guest mode keeps everything local on this device. No cloud sync, no password fuss.';
-        els.authPrimaryBtn.textContent = 'Continue as guest';
-        els.authSecondaryBtn.textContent = 'Back to sign in';
-        els.authFootNote.textContent = 'guest mode is fine for testing, bad for anything you actually care about.';
-        els.nameField.style.display = '';
-        els.emailField.style.display = 'none';
-        els.passwordField.style.display = 'none';
-      }
-    }
-
-    function togglePasswordVisibility() {
-      state.passwordVisible = !state.passwordVisible;
-      els.userpasswordInput.type = state.passwordVisible ? 'text' : 'password';
-      els.passwordToggle.textContent = state.passwordVisible ? 'hide' : 'show';
-    }
-
-    async function completeLogin({ name, email, uid }) {
-      const cloud = await loadCloud(uid, email);
-      const local = loadLocal(email);
-      const localEdit = parseInt(localStorage.getItem(lastEditKey(email)) || '0', 10);
-      const cloudEdit = state.lastCloudUpdatedAt ? new Date(state.lastCloudUpdatedAt).getTime() : 0;
-      if (cloud && local && localEdit > cloudEdit) state.userData = ensureUserData(local);
-      else if (cloud) state.userData = ensureUserData(cloud);
-      else if (local) state.userData = ensureUserData(local);
-      else state.userData = makeDefaultUser(name, email);
-      state.userData.profileName = name;
-      state.userData.profileEmail = email;
-      state.activeEmail = email;
-      state.activeUid = uid;
-      persistAndSync();
-      startPoll();
-      showAppScreen();
-      showToast(`Welcome, ${name}.`, 'success');
-    }
-
-    async function handleAuthAction() {
-      hideStatus(els.loginStatus);
-      const name = els.usernameInput.value.trim();
-      const email = els.useremailInput.value.trim();
-      const password = els.userpasswordInput.value;
-
-      if (state.loginMode === 'guest') {
-        if (!name) return showStatus(els.loginStatus, 'required info missing. give guest mode a name at least.', 'error');
-        state.activeEmail = 'guest@local.app';
-        state.activeUid = 'guest';
-        state.userData = ensureUserData(loadLocal('guest@local.app') || makeDefaultUser(name, 'guest@local.app'));
-        state.userData.profileName = name;
-        state.userData.profileEmail = 'guest@local.app';
-        saveLocal();
-        setSyncStatus('guest');
-        showAppScreen();
-        showToast(`Guest mode ready, ${name}.`, 'info');
-        return;
-      }
-
-      if (!name || !email || !password) {
-        return showStatus(els.loginStatus, 'required info missing. fill in every required field first.', 'error');
-      }
-
-      if (password.length < 6) {
-        return showStatus(els.loginStatus, 'password too short. make it at least 6 characters.', 'error');
-      }
-
-      try {
-        if (state.loginMode === 'signup') {
-          const created = await createUserWithEmailAndPassword(auth, email, password);
-          await completeLogin({ name, email, uid: created.user.uid });
-          showToast('Account created successfully.', 'success');
           return;
         }
 
-        // SIGNIN: only sign in, never auto-create
-        const signed = await signInWithEmailAndPassword(auth, email, password);
-        await completeLogin({ name, email, uid: signed.user.uid });
-      } catch (error) {
-        if (['auth/user-not-found', 'auth/invalid-credential', 'auth/invalid-login-credentials'].includes(error.code)) {
-          if (state.loginMode === 'signin') {
-            showStatus(els.loginStatus, 'no account found with that email. switch to sign up to create one.', 'error');
+        // SIGNIN: only sign in, NEVER auto-create
+        try {
+          const cred = await signInWithEmailAndPassword(auth, email, pw);
+          await finishAuth(name, email, cred.user.uid);
+        } catch(e) {
+          hideAuthLoad();
+          if(['auth/user-not-found','auth/invalid-credential','auth/invalid-login-credentials'].includes(e.code)) {
+            showSt($('loginStatus'),'no account found with that email. switch to sign up to create one.');
+          } else if(e.code==='auth/wrong-password') {
+            showSt($('loginStatus'),'wrong password.');
+          } else if(e.code==='auth/too-many-requests') {
+            showSt($('loginStatus'),'too many attempts. wait a bit.');
           } else {
-            showStatus(els.loginStatus, 'could not create account. email may already be registered with a different password.', 'error');
+            showSt($('loginStatus'), e.message||'sign in failed.');
           }
-        } else if (error.code === 'auth/wrong-password') {
-          showStatus(els.loginStatus, 'wrong password. try again.', 'error');
-        } else if (error.code === 'auth/email-already-in-use') {
-          showStatus(els.loginStatus, 'this email already has an account. switch to sign in.', 'error');
-        } else if (error.code === 'auth/too-many-requests') {
-          showStatus(els.loginStatus, 'too many failed attempts. wait a bit and try again.', 'error');
-        } else {
-          showStatus(els.loginStatus, error.message || 'auth failed.', 'error');
         }
-      }
-        showStatus(els.loginStatus, error.message || 'auth failed.', 'error');
-      }
+      } catch(e) { hideAuthLoad(); showSt($('loginStatus'), e.message||'auth error.'); }
     }
 
-    async function logout() {
-      stopCountdownLoop();
-      stopPoll();
-      stopNotificationsLoop();
-      persistAndSync();
-      const wasGuest = isGuest(state.activeEmail);
-      state.activeEmail = null;
-      state.activeUid = null;
-      state.userData = null;
-      state.lastCloudUpdatedAt = null;
-      if (!wasGuest) {
-        try { await signOut(auth); } catch {}
-      }
-      localStorage.removeItem(STORAGE_KEYS.active);
-      showLoginScreen();
+    async function finishAuth(name, email, uid) {
+      S.email=email; S.uid=uid; S.lastCloud=null;
+      let cloud=null;
+      try { const snap=await getDoc(doc(db,'users',uid)); if(snap.exists()){const d=snap.data();S.lastCloud=d.updated_at||null;cloud=d.data||null;} } catch {}
+      const local=loadL(email);
+      const le=parseInt(localStorage.getItem('dtp_le_'+email)||'0',10);
+      const ce=S.lastCloud?new Date(S.lastCloud).getTime():0;
+      if(cloud&&local&&le>ce)S.data=ensure(local);else if(cloud)S.data=ensure(cloud);else if(local)S.data=ensure(local);else S.data=makeDef(name,email);
+      S.data.profileName=name; S.data.profileEmail=email;
+      persist(); startPoll(); hideAuthLoad(); hideLoad(); showApp();
+      toast(`Welcome, ${name}.`,'success');
     }
 
-    async function sendComplaint() {
-      hideStatus(els.complaintStatus);
-      const text = els.complaintText.value.trim();
-      if (!text) return showStatus(els.complaintStatus, 'write the issue first.', 'error');
-      const form = new FormData();
-      form.append('message', text);
-      form.append('email', state.activeEmail || 'unknown');
-      form.append('name', state.userData?.profileName || 'unknown');
-      form.append('_subject', 'Days Tracking Pro: Report');
-      try {
-        const res = await fetch('https://formspree.io/f/xbdeqknr', {
-          method: 'POST',
-          body: form,
-          headers: { Accept: 'application/json' }
-        });
-        if (!res.ok) throw new Error('failed to send');
-        showStatus(els.complaintStatus, 'report sent. nice, now the bug has nowhere to hide.', 'success');
-        els.complaintText.value = '';
-      } catch {
-        showStatus(els.complaintStatus, 'send failed. network issue or form issue.', 'error');
-      }
+    async function doLogout() { stopTick(); stopPoll(); persist(); S.email=null;S.uid=null;S.data=null;S.lastCloud=null; localStorage.removeItem('dtp_active'); try{await signOut(auth);}catch{} showLogin(); }
+
+    // ═══════ EVENTS ═══════
+    function bind() {
+      document.querySelectorAll('.mode-btn').forEach(b=>b.addEventListener('click',()=>updateMode(b.dataset.mode)));
+      $('authBtn').addEventListener('click', doAuth);
+      $('authAltBtn').addEventListener('click',()=>{if(S.mode==='guest'||S.mode==='signup')updateMode('signin');else updateMode('guest');});
+      $('pwToggle').addEventListener('click',()=>{S.pwVis=!S.pwVis;$('passwordInput').type=S.pwVis?'text':'password';$('pwToggle').textContent=S.pwVis?'hide':'show';});
+      $('passwordInput').addEventListener('keydown',e=>{if(e.key==='Enter')doAuth();});
+      $('logoutBtn').addEventListener('click', doLogout);
+      $('themeBtn').addEventListener('click', cycleTheme);
+      $('habitInput').addEventListener('input',()=>{if(!S.data)return;clearTimeout(bind.ht);bind.ht=setTimeout(()=>{S.data.habitName=$('habitInput').value.trim()||'My Habit';persist();render();},400);});
+      $('endCycleBtn').addEventListener('click',()=>openM('endModal'));
+      $('confirmEndBtn').addEventListener('click', saveCycle);
+      $('confirmDeleteBtn').addEventListener('click', delRecord);
+      $('datePanelBtn').addEventListener('click',()=>openM('dateModal'));
+      $('timerPanelBtn').addEventListener('click',()=>openM('timerModal'));
+      $('applyDateBtn').addEventListener('click', applyDate);
+      $('resetDateBtn').addEventListener('click', resetDate);
+      $('setTimerBtn').addEventListener('click',()=>{const ms=parseTimer($('customTimerInput').value);if(!ms||ms<=0)return toast('invalid format.','error');setTimer(ms);$('customTimerInput').value='';closeM('timerModal');});
+      $('offTimerBtn').addEventListener('click',()=>{setTimer('never');closeM('timerModal');});
+      $('notifBtn').addEventListener('click', toggleNotif);
+      document.querySelectorAll('[data-close]').forEach(b=>b.addEventListener('click',()=>closeM(b.dataset.close)));
+      document.addEventListener('click',e=>{
+        const mk=e.target.closest('[data-mark]');if(mk){markDay(mk.dataset.key,mk.dataset.mark);return;}
+        const vw=e.target.closest('[data-view]');if(vw){viewRec(parseInt(vw.dataset.view));return;}
+        const dl=e.target.closest('[data-del]');if(dl){S.delIdx=parseInt(dl.dataset.del);openM('deleteModal');return;}
+        if(e.target.classList.contains('modal'))closeM(e.target.id);
+        const tp=e.target.closest('[data-ms]');if(tp){setTimer(tp.dataset.ms==='never'?'never':parseInt(tp.dataset.ms));closeM('timerModal');}
+      });
+      document.addEventListener('keydown',e=>{if(e.key==='Escape')document.querySelectorAll('.modal.active').forEach(m=>m.classList.remove('active'));});
+      window.addEventListener('online',()=>{S.online=true;schedSync();pull();});
+      window.addEventListener('offline',()=>{S.online=false;setSync(isG(S.email)?'guest':'offline');});
+      window.addEventListener('beforeunload',saveL);
     }
 
-    function bindEvents() {
-      els.themeToggleLogin.addEventListener('click', cycleTheme);
-      els.themeToggleApp.addEventListener('click', cycleTheme);
-      els.passwordToggle.addEventListener('click', togglePasswordVisibility);
-      els.authPrimaryBtn.addEventListener('click', handleAuthAction);
-      els.authSecondaryBtn.addEventListener('click', () => {
-        if (state.loginMode === 'signin') updateLoginMode('guest');
-        else if (state.loginMode === 'signup') updateLoginMode('signin');
-        else updateLoginMode('signin');
-      });
-      els.modeButtons.forEach((btn) => btn.addEventListener('click', () => updateLoginMode(btn.dataset.mode)));
-      els.logoutBtn.addEventListener('click', logout);
-      els.habitNameInput.addEventListener('input', () => {
-        if (!state.userData) return;
-        clearTimeout(bindEvents.habitTimer);
-        bindEvents.habitTimer = setTimeout(() => {
-          state.userData.habitName = els.habitNameInput.value.trim() || 'My Habit';
-          persistAndSync();
-          renderMeta();
-        }, 450);
-      });
-      els.saveCycleBtn.addEventListener('click', () => openModal('confirmModal'));
-      els.confirmCycleBtn.addEventListener('click', saveCycle);
-      els.confirmDeleteBtn.addEventListener('click', deleteRecord);
-      els.toggleDatePanel.addEventListener('click', () => els.dateDrawer.scrollIntoView({ behavior: 'smooth', block: 'start' }));
-      els.toggleTimerPanel.addEventListener('click', () => els.timerDrawer.scrollIntoView({ behavior: 'smooth', block: 'start' }));
-      els.jumpTodayBtn.addEventListener('click', () => {
-        const todayCard = els.daysGrid.querySelector('.calendar-day.today');
-        if (todayCard) todayCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        else showToast('Today is outside the current cycle window.', 'info');
-      });
-      els.resetDefaultsBtn.addEventListener('click', resetDefaults);
-      els.applyDateBtn.addEventListener('click', applyDateWindow);
-      els.restoreDateBtn.addEventListener('click', resetDefaults);
-      els.setCustomTimerBtn.addEventListener('click', () => {
-        const ms = parseTimerInput(els.customTimerInput.value);
-        if (!ms || ms <= 0) return showToast('invalid timer format. try 45m or 2h 30m.', 'error');
-        setTimer(ms);
-        els.customTimerInput.value = '';
-      });
-      els.removeTimerBtn.addEventListener('click', () => setTimer('never'));
-      Array.from(els.timerPresetRow.querySelectorAll('.tag')).forEach((btn) => {
-        btn.addEventListener('click', () => setTimer(btn.dataset.ms === 'never' ? 'never' : parseInt(btn.dataset.ms, 10)));
-      });
-      els.toggleNotificationsBtn.addEventListener('click', async () => {
-        if (isNotificationsOn()) {
-          localStorage.setItem(STORAGE_KEYS.notif, 'off');
-          updateNotificationButton();
-          stopNotificationsLoop();
-          return showToast('Notifications muted.', 'info');
-        }
-        if (!('Notification' in window)) return showToast('This browser does not support notifications.', 'error');
-        if (Notification.permission === 'granted') {
-          localStorage.setItem(STORAGE_KEYS.notif, 'on');
-          updateNotificationButton();
-          startNotificationsLoop();
-          return showToast('Notifications enabled.', 'success');
-        }
-        if (Notification.permission === 'denied') return showToast('Browser blocked notifications. change that in settings.', 'error');
-        const permission = await Notification.requestPermission();
-        if (permission === 'granted') {
-          localStorage.setItem(STORAGE_KEYS.notif, 'on');
-          updateNotificationButton();
-          startNotificationsLoop();
-          showToast('Notifications enabled.', 'success');
-        } else showToast('Notification permission denied.', 'error');
-      });
-      els.sendComplaintBtn.addEventListener('click', sendComplaint);
-      els.clearComplaintBtn.addEventListener('click', () => { els.complaintText.value = ''; hideStatus(els.complaintStatus); });
-      els.modalClosers.forEach((btn) => btn.addEventListener('click', () => closeModal(btn.dataset.closeModal)));
-      document.addEventListener('click', (event) => {
-        const markBtn = event.target.closest('[data-mark]');
-        if (markBtn) return markDay(markBtn.dataset.key, markBtn.dataset.mark);
-        const viewBtn = event.target.closest('[data-view-record]');
-        if (viewBtn) return viewRecord(parseInt(viewBtn.dataset.viewRecord, 10));
-        const delBtn = event.target.closest('[data-delete-record]');
-        if (delBtn) {
-          state.deleteIndex = parseInt(delBtn.dataset.deleteRecord, 10);
-          return openModal('deleteModal');
-        }
-        if (event.target.classList.contains('modal')) closeModal(event.target.id);
-      });
-      document.addEventListener('keydown', (event) => {
-        if (event.key === 'Escape') document.querySelectorAll('.modal.active').forEach((modal) => modal.classList.remove('active'));
-        if (event.key === 'Enter' && document.activeElement === els.userpasswordInput) handleAuthAction();
-      });
-      window.addEventListener('beforeunload', saveLocal);
-      window.addEventListener('online', () => { state.isOnline = true; scheduleCloudSync(); pullCloud(); setSyncStatus(isGuest(state.activeEmail) ? 'guest' : 'synced'); });
-      window.addEventListener('offline', () => { state.isOnline = false; setSyncStatus(isGuest(state.activeEmail) ? 'guest' : 'offline'); });
-      document.addEventListener('visibilitychange', () => { if (!document.hidden) pullCloud(); });
+    function markDay(k, ns) { if(!S.data||S.data.locked[k]) return; const cur=S.data.trackerData[k]||'none'; S.data.trackerData[k]=cur===ns?'none':ns; S.data.timestamps[k]=Date.now(); persist(); render(); }
+    function applyDate() { if(!S.data)return; const day=parseInt($('adjDay').value)||1,mo=parseInt($('adjMonth').value),yr=parseInt($('adjYear').value)||2026,cnt=Math.max(1,Math.min(366,parseInt($('adjDays').value)||30)); const mx=new Date(yr,mo+1,0).getDate(); S.data.customStart=new Date(yr,mo,Math.min(day,mx)).toISOString(); S.data.daysCount=cnt; S.data.trackerData={}; S.data.timestamps={}; S.data.locked={}; persist(); render(); closeM('dateModal'); toast('Date window updated.','success'); }
+    function resetDate() { if(!S.data)return; S.data.customStart=null; S.data.daysCount=30; S.data.trackerData={}; S.data.timestamps={}; S.data.locked={}; persist(); render(); closeM('dateModal'); }
+    function setTimer(ms) { if(!S.data)return; S.data.fadeDuration=ms; if(ms!=='never')getDates().forEach(d=>{const k=fk(d);if(S.data.trackerData[k]&&S.data.trackerData[k]!=='none')S.data.timestamps[k]=Date.now();}); persist(); render(); toast(ms==='never'?'Timer disabled.':`Timer: ${fmtDur(ms)}.`,'success'); }
+
+    function saveCycle() {
+      if(!S.data)return; const start=getStart(),tot=S.data.daysCount||30; let ck=0,cr=0; const days=[];
+      for(let i=0;i<tot;i++){const d=new Date(start);d.setDate(start.getDate()+i);const k=fk(d),v=S.data.trackerData[k]||'none';if(v==='checked')ck++;if(v==='crossed')cr++;days.push({date:d.getDate(),dayName:DS[d.getDay()],state:v});}
+      const end=new Date(start);end.setDate(start.getDate()+tot-1);
+      const period=`${MO[start.getMonth()].slice(0,3)} ${start.getDate()} - ${MO[end.getMonth()].slice(0,3)} ${end.getDate()}, ${end.getFullYear()}`;
+      S.data.history.unshift({habitName:S.data.habitName,period,checked:ck,crossed:cr,total:tot,days,savedAt:Date.now()});
+      S.data.trackerData={};S.data.timestamps={};S.data.locked={};
+      const ns=new Date(end);ns.setDate(ns.getDate()+1);S.data.customStart=ns.toISOString();
+      persist();render();closeM('endModal');toast('Cycle saved!','success');
     }
 
-    if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('./sw.js').catch(() => {});
-    }
+    function delRecord() { if(S.delIdx==null||!S.data?.history?.[S.delIdx])return; S.data.history.splice(S.delIdx,1); S.delIdx=null; persist(); render(); closeM('deleteModal'); toast('Deleted.','info'); }
+    function viewRec(i) { const r=S.data?.history?.[i]; if(!r)return; $('viewTitle').textContent=r.habitName||'Record'; $('viewGrid').innerHTML=(r.days||[]).map(d=>`<div class="cal-day ${d.state==='checked'?'checked':d.state==='crossed'?'crossed':''}" style="min-height:70px;cursor:default;"><div class="day-week">${d.dayName||''}</div><div class="day-num">${d.date||''}</div></div>`).join(''); openM('viewModal'); }
 
-    function bootGuestFromStorage(email) {
-      const local = loadLocal(email);
-      if (!local) return false;
-      state.activeEmail = email;
-      state.activeUid = 'guest';
-      state.userData = ensureUserData(local);
-      setSyncStatus('guest');
-      showAppScreen();
-      return true;
-    }
+    function openM(id){$(id).classList.add('active');}function closeM(id){$(id).classList.remove('active');}
 
-    bindEvents();
-    initTheme();
-    updateLoginMode('signin');
-    updateNotificationButton();
+    function toggleNotif() { const on=localStorage.getItem('dtp_notif')==='on'; if(on){localStorage.setItem('dtp_notif','off');$('notifBtn').textContent='notifications off';$('notifBtn').classList.remove('active');toast('Notifications off.','info');return;} if(!('Notification' in window))return toast('Not supported.','error'); if(Notification.permission==='granted'){localStorage.setItem('dtp_notif','on');$('notifBtn').textContent='notifications on';$('notifBtn').classList.add('active');toast('Notifications on!','success');}else if(Notification.permission==='denied'){toast('Blocked in browser settings.','error');}else{Notification.requestPermission().then(p=>{if(p==='granted'){localStorage.setItem('dtp_notif','on');$('notifBtn').textContent='notifications on';$('notifBtn').classList.add('active');toast('Notifications on!','success');}else toast('Denied.','error');});} }
+
+    // ═══════ THEME ═══════
+    function setTheme(t){if(t==='dark')document.body.removeAttribute('data-theme');else document.body.setAttribute('data-theme',t);localStorage.setItem('dtp_theme',t);const l={dark:'☀ light',light:'◐ grey',grey:'☾ dark'};$('themeBtn').textContent=l[t];}
+    function cycleTheme(){const c=document.body.getAttribute('data-theme')||'dark';const o=['dark','light','grey'];setTheme(o[(o.indexOf(c)+1)%o.length]);}
+    function initTheme(){setTheme(localStorage.getItem('dtp_theme')||'dark');}
+
+    // ═══════ TIMER PRESETS UI ═══════
+    function renderPresets() { $('timerPresets').innerHTML=PRESETS.map(([label,ms])=>`<button class="tag" data-ms="${ms}" type="button">${label}</button>`).join(''); }
+
+    // ═══════ INIT ═══════
+    if('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js').catch(()=>{});
+
+    bind(); initTheme(); updateMode('signin'); renderPresets();
+    if(localStorage.getItem('dtp_notif')==='on'){$('notifBtn').textContent='notifications on';$('notifBtn').classList.add('active');}
 
     onAuthStateChanged(auth, async (user) => {
-      const saved = localStorage.getItem(STORAGE_KEYS.active);
+      const saved = localStorage.getItem('dtp_active');
       if (user) {
-        state.activeEmail = user.email;
-        state.activeUid = user.uid;
-        const cloud = await loadCloud(user.uid, user.email);
-        const local = loadLocal(user.email);
-        const localEdit = parseInt(localStorage.getItem(lastEditKey(user.email)) || '0', 10);
-        const cloudEdit = state.lastCloudUpdatedAt ? new Date(state.lastCloudUpdatedAt).getTime() : 0;
-        if (cloud && cloudEdit > localEdit) state.userData = ensureUserData(cloud);
-        else if (local) state.userData = ensureUserData(local);
-        else state.userData = makeDefaultUser(user.displayName || 'User', user.email || 'unknown');
-        startPoll();
-        showAppScreen();
-      } else if (saved && isGuest(saved) && bootGuestFromStorage(saved)) {
-        return;
+        // User is already signed in (persisted session)
+        S.email = user.email; S.uid = user.uid;
+        let cloud = null;
+        try { const snap=await getDoc(doc(db,'users',user.uid)); if(snap.exists()){const d=snap.data();S.lastCloud=d.updated_at||null;cloud=d.data||null;} } catch {}
+        const local = loadL(user.email);
+        const le = parseInt(localStorage.getItem('dtp_le_'+user.email)||'0',10);
+        const ce = S.lastCloud?new Date(S.lastCloud).getTime():0;
+        if(cloud&&ce>le) S.data=ensure(cloud); else if(local) S.data=ensure(local); else S.data=makeDef(user.displayName||'User',user.email);
+        if(!S.data.profileName||S.data.profileName==='Guest') S.data.profileName=user.displayName||user.email?.split('@')[0]||'User';
+        startPoll(); hideLoad(); showApp();
+      } else if (saved && isG(saved)) {
+        const local = loadL(saved);
+        if(local){S.email=saved;S.uid='guest';S.data=ensure(local);setSync('guest');hideLoad();showApp();}
+        else{hideLoad();showLogin();}
       } else {
-        showLoginScreen();
+        hideLoad(); showLogin();
       }
     });
   </script>
